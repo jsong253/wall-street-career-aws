@@ -32,7 +32,7 @@
     "testPathIgnorePatterns":[
       "/terrafrom/scaffold/",
       "/node_modules/"
-    ]
+    ],
     "testResultsProcessor":"./node_modules/jest-junit-reporter"
   },
   "devDependencies": {
