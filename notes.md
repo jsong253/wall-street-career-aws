@@ -498,3 +498,5 @@ PS C:\project area\wall-street-career-aws>
 
 // invoke lambda function from CLI
 PS C:\project area\wall-street-career-aws> aws lambda invoke --function-name RegistrationsLambda response.json
+
+// execute get method in the broswer: https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
