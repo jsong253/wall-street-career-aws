@@ -229,14 +229,3 @@ module.api_gateway.aws_api_gateway_rest_api.rest_api: Destruction complete after
 Destroy complete! Resources: 6 destroyed.
 PS C:\project area\wall-street-career-aws>
 
-
-# PS C:\project area\wall-street-career-aws\terraform\modules\lambda_function> npm init- y
-# PS C:\project area\wall-street-career-aws\terraform\modules\lambda_function> npm install jwt-decode
-
-
-# Outputs:
-
-cognito_client_id = "5160k0ou0rdr4rf6d86r16t0mb"
-cognito_user_pool_id = "us-east-1_XuvZQmBE8"
-rest_api_url = "https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations"
-PS C:\project area\wall-street-career-aws>

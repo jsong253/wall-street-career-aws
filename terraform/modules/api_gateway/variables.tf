@@ -34,11 +34,6 @@ variable "rest_api_stage_name" {
   default     = "prod" //add a stage name as per your requirement
 }
 
-variable "cognito_user_pool_arn" {
-  type        = string
-  description = "The ARN of the user pool"
-} //value comes from main.tf
-
 variable "cors_allowed_origin" {
   type        = string
   description = "The allowed origins of the browser"
