@@ -499,4 +499,17 @@ PS C:\project area\wall-street-career-aws>
 // invoke lambda function from CLI
 PS C:\project area\wall-street-career-aws> aws lambda invoke --function-name RegistrationsLambda response.json
 
-// execute get method in the broswer: https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
+// execute get method in the broswer: 
+https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
+
+# postman: https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
+
+
+# errors when CORS are not set up on the aws rest api end point: Access to fetch at 'https://rtkuir7kpi.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+# after adding the OPTIONS method and tried again:
+  Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+  Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: Request header field access-control-allow-origin is not allowed by Access-Control-Allow-Headers in preflight response.
+
+  Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.

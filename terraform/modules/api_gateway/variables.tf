@@ -33,3 +33,9 @@ variable "rest_api_stage_name" {
   description = "The name of the API Gateway stage"
   default     = "prod" //add a stage name as per your requirement
 }
+
+variable "cors_allowed_origin" {
+  type        = string
+  description = "The allowed origins of the browser"
+  default     = "http://localhost:3000" 
+}

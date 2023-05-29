@@ -30,11 +30,24 @@ const movies = [
 ];
 
 exports.handler = async (event) => {
-	return {
-		statusCode: 200,
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body:  JSON.stringify({ movies }), //sending the array of registrations as stringified JSON in the response
-	};
+   console.log(`index.js registrations start`)
+   console.log(`event: ${JSON.stringify(event, null, 4)}`)
+
+   try{
+      return {
+         statusCode: 200,
+         headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin" : "http://localhost:3000/",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+         },
+         body:  JSON.stringify({ movies }), //sending the array of registrations as stringified JSON in the response
+      };
+   }
+   catch(e){
+      console.log(`error: ${JSON.stringify(e, null, 4)}`)
+   }
+   finally{
+      console.log(`index.js registrations end`)
+   }
 };
