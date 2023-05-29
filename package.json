@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --collectCoverage tests/unit",
-    "test:debug":"node --inspect-brk=9229 ./src/app.js",
+    "test:debug": "node --inspect-brk=9229 ./src/app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "github" : "cmd.exe /k start chrome.exe https://github.com/jsong253/wall-street-career-aws"
+    "github": "cmd.exe /k start chrome.exe https://github.com/jsong253/wall-street-career-aws"
   },
   "keywords": [
     "equity",
@@ -24,16 +24,16 @@
     "type": "git",
     "url": "git@github.com/jsong253/wall-street-career-aws.git"
   },
-  "jest":{
-    "collectCoverageFrom" :[
+  "jest": {
+    "collectCoverageFrom": [
       "terraform/common/**/*.js",
       "terraform/modules/**/*.js"
     ],
-    "testPathIgnorePatterns":[
+    "testPathIgnorePatterns": [
       "/terrafrom/scaffold/",
       "/node_modules/"
     ],
-    "testResultsProcessor":"./node_modules/jest-junit-reporter"
+    "testResultsProcessor": "./node_modules/jest-junit-reporter"
   },
   "devDependencies": {
     "jest": "^29.5.0",

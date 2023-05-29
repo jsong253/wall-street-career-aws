@@ -513,3 +513,10 @@ https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
   Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: Request header field access-control-allow-origin is not allowed by Access-Control-Allow-Headers in preflight response.
 
   Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+  # Outputs:
+
+cognito_client_id = "5160k0ou0rdr4rf6d86r16t0mb"
+cognito_user_pool_id = "us-east-1_XuvZQmBE8"
+rest_api_url = "https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations"
+PS C:\project area\wall-street-career-aws>

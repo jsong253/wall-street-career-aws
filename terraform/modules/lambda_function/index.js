@@ -1,3 +1,5 @@
+const jwtDecode = require("jwt-decode");
+
 const registrations = [
     {
        "FirstName": "Jian",
@@ -7,6 +9,7 @@ const registrations = [
        "Start" : "2023-05-24",
        "End" : "2023-11-24",
        "Phone":"9522504286",
+       "registrationType":"standard",
        "Active" : true
     },
     {
@@ -17,6 +20,7 @@ const registrations = [
         "Start" : "2023-05-24",
         "End" : "2023-11-24",
         "Phone":"9522504286",
+        "registrationType":"premium",
         "Active" : true
      }
 ];
@@ -30,6 +34,8 @@ const movies = [
 ];
 
 exports.handler = async (event) => {
+   const decodedToken = jwtDecode(event.headers.Authorization);      // Notice that the Authorization header is sent as a payload to the event object
+
    console.log(`index.js registrations start`)
    console.log(`event: ${JSON.stringify(event, null, 4)}`)
 
@@ -41,7 +47,10 @@ exports.handler = async (event) => {
             "Access-Control-Allow-Origin" : "http://localhost:3000/",
             "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
          },
-         body:  JSON.stringify({ movies }), //sending the array of registrations as stringified JSON in the response
+         body:  JSON.stringify({ 
+            movies,
+            username: decodedToken["cognito:username"], 
+         }), //sending the array of registrations as stringified JSON in the response
       };
    }
    catch(e){
