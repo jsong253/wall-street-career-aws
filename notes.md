@@ -513,3 +513,53 @@ https://jlmie38mea.execute-api.us-east-1.amazonaws.com/prod/registrations
   Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: Request header field access-control-allow-origin is not allowed by Access-Control-Allow-Headers in preflight response.
 
   Access to fetch at 'https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+
+  # aws console GET request test:
+  Request: /registrations
+Status: 200
+Latency: 391 ms
+Response Body
+{"movies":["Schindlers List","Shawshank Redemption","Batman The Dark Knight","Spider-Man : No Way Home","Avengers"]}
+Response Headers
+{"Access-Control-Allow-Headers":["Content-Type"],"Access-Control-Allow-Methods":["OPTIONS,GET"],"Access-Control-Allow-Origin":["*"],"Content-Type":["application/json"],"X-Amzn-Trace-Id":["Root=1-64754fe5-084fc11dc5ca6bb8641894f5;Sampled=0"]}
+Logs
+Execution log for request 4b8ae478-ac2d-4fff-96e9-870739d88db2
+Tue May 30 01:22:45 UTC 2023 : Starting execution for request: 4b8ae478-ac2d-4fff-96e9-870739d88db2
+Tue May 30 01:22:45 UTC 2023 : HTTP Method: GET, Resource Path: /registrations
+Tue May 30 01:22:45 UTC 2023 : Method request path: {}
+Tue May 30 01:22:45 UTC 2023 : Method request query string: {}
+Tue May 30 01:22:45 UTC 2023 : Method request headers: {}
+Tue May 30 01:22:45 UTC 2023 : Method request body before transformations: 
+Tue May 30 01:22:45 UTC 2023 : Endpoint request URI: https://lambda.us-east-1.amazonaws.com/2015-03-31/functions/arn:aws:lambda:us-east-1:770646514888:function:RegistrationsLambda/invocations
+Tue May 30 01:22:45 UTC 2023 : Endpoint request headers: {X-Amz-Date=20230530T012245Z, x-amzn-apigateway-api-id=aaiiuxs4r8, Accept=application/json, User-Agent=AmazonAPIGateway_aaiiuxs4r8, Host=lambda.us-east-1.amazonaws.com, X-Amz-Content-Sha256=e453252d2d015ca2c209e05da741b0b5b42d280f9b76573e2ef5c34781a7edfc, X-Amzn-Trace-Id=Root=1-64754fe5-084fc11dc5ca6bb8641894f5, x-amzn-lambda-integration-tag=4b8ae478-ac2d-4fff-96e9-870739d88db2, Authorization=*********************************************************************************************************************************************************************************************************************************************************************************************************************************************4822f2, X-Amz-Source-Arn=arn:aws:execute-api:us-east-1:770646514888:aaiiuxs4r8/test-invoke-stage/GET/registrations, X-Amz-Security-Token=IQoJb3JpZ2luX2VjEEkaCXVzLWVhc3QtMSJGMEQCICbvbNhWR/g95DQUgucWl5+TNk0Rc8n8/iWWvtueaHWSAiAClhg+EVYl1OetRS2eS6usD5IjfsnQhw3TaWM5BDQ3syq6 [TRUNCATED]
+Tue May 30 01:22:45 UTC 2023 : Endpoint request body after transformations: {"resource":"/registrations","path":"/registrations","httpMethod":"GET","headers":null,"multiValueHeaders":null,"queryStringParameters":null,"multiValueQueryStringParameters":null,"pathParameters":null,"stageVariables":null,"requestContext":{"resourceId":"ic4ebg","resourcePath":"/registrations","httpMethod":"GET","extendedRequestId":"Ftlr2FI1IAMFUuA=","requestTime":"30/May/2023:01:22:45 +0000","path":"/registrations","accountId":"770646514888","protocol":"HTTP/1.1","stage":"test-invoke-stage","domainPrefix":"testPrefix","requestTimeEpoch":1685409765146,"requestId":"4b8ae478-ac2d-4fff-96e9-870739d88db2","identity":{"cognitoIdentityPoolId":null,"cognitoIdentityId":null,"apiKey":"test-invoke-api-key","principalOrgId":null,"cognitoAuthenticationType":null,"userArn":"arn:aws:iam::770646514888:root","apiKeyId":"test-invoke-api-key-id","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36","accountId": [TRUNCATED]
+Tue May 30 01:22:45 UTC 2023 : Sending request to https://lambda.us-east-1.amazonaws.com/2015-03-31/functions/arn:aws:lambda:us-east-1:770646514888:function:RegistrationsLambda/invocations
+Tue May 30 01:22:45 UTC 2023 : Received response. Status: 200, Integration latency: 388 ms
+Tue May 30 01:22:45 UTC 2023 : Endpoint response headers: {Date=Tue, 30 May 2023 01:22:45 GMT, Content-Type=application/json, Content-Length=327, Connection=keep-alive, x-amzn-RequestId=30d10735-7c5d-42a5-89d5-91097fc146f4, x-amzn-Remapped-Content-Length=0, X-Amz-Executed-Version=$LATEST, X-Amzn-Trace-Id=root=1-64754fe5-084fc11dc5ca6bb8641894f5;sampled=0}
+Tue May 30 01:22:45 UTC 2023 : Endpoint response body before transformations: {"statusCode":200,"headers":{"Content-Type":"application/json","Access-Control-Allow-Headers":"Content-Type","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"OPTIONS,GET"},"body":"{\"movies\":[\"Schindlers List\",\"Shawshank Redemption\",\"Batman The Dark Knight\",\"Spider-Man : No Way Home\",\"Avengers\"]}"}
+Tue May 30 01:22:45 UTC 2023 : Method response body after transformations: {"movies":["Schindlers List","Shawshank Redemption","Batman The Dark Knight","Spider-Man : No Way Home","Avengers"]}
+Tue May 30 01:22:45 UTC 2023 : Method response headers: {Content-Type=application/json, Access-Control-Allow-Headers=Content-Type, Access-Control-Allow-Origin=*, Access-Control-Allow-Methods=OPTIONS,GET, X-Amzn-Trace-Id=Root=1-64754fe5-084fc11dc5ca6bb8641894f5;Sampled=0}
+Tue May 30 01:22:45 UTC 2023 : Successfully completed execution
+Tue May 30 01:22:45 UTC 2023 : Method completed with status: 200
+
+# aws console OPTIONS test:
+Request: /registrations
+Status: 200
+Latency: 5 ms
+Response Body
+no data
+Response Headers
+{"Access-Control-Allow-Headers":["Content-Type"],"Access-Control-Allow-Methods":["GET,OPTIONS"],"Access-Control-Allow-Origin":["*"],"Content-Type":["application/json"]}
+Logs
+Execution log for request bbda39d8-9df9-41aa-95c1-5c779acb8433
+Tue May 30 01:31:59 UTC 2023 : Starting execution for request: bbda39d8-9df9-41aa-95c1-5c779acb8433
+Tue May 30 01:31:59 UTC 2023 : HTTP Method: OPTIONS, Resource Path: /registrations
+Tue May 30 01:31:59 UTC 2023 : Method request path: {}
+Tue May 30 01:31:59 UTC 2023 : Method request query string: {}
+Tue May 30 01:31:59 UTC 2023 : Method request headers: {}
+Tue May 30 01:31:59 UTC 2023 : Method request body before transformations: 
+Tue May 30 01:31:59 UTC 2023 : Method response body after transformations: 
+Tue May 30 01:31:59 UTC 2023 : Method response headers: {Access-Control-Allow-Headers=Content-Type, Access-Control-Allow-Methods=GET,OPTIONS, Access-Control-Allow-Origin=*, Content-Type=application/json}
+Tue May 30 01:31:59 UTC 2023 : Successfully completed execution
+Tue May 30 01:31:59 UTC 2023 : Method completed with status: 200
