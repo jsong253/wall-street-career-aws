@@ -15,7 +15,18 @@ resource "aws_api_gateway_method" "rest_api_get_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_resource.id
   http_method = "GET"
-  authorization = "NONE"
+  authorization = "NONE"            // "CUSTOM"
+  
+  request_validator_id = aws_api_gateway_request_validator.rest_api_get_method_validator.id
+
+  // authorizer_id        = aws_api_gateway_authorizer.rest_api_get_method_validator_authorizer.id
+
+  request_parameters   = {
+    "method.request.querystring.email"          = false,
+    "method.request.querystring.password"       = false,
+  }
+
+  api_key_required     = false
 }
 
 resource "aws_api_gateway_integration" "rest_api_get_method_integration" {
@@ -156,4 +167,29 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
 # }
 # end of cors implementation
 
+resource "aws_api_gateway_request_validator" "rest_api_get_method_validator" {
+  name                        = "get_method-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
+  validate_request_body       = false
+  validate_request_parameters = true
+}
 
+# resource "aws_api_gateway_authorizer" "rest_api_get_method_authorizer" {
+
+#   name                              = "api-gateway-authorizer-${var.env}"
+
+#   rest_api_id                       = aws_api_gateway_rest_api.rest_api.id
+
+#   authorizer_uri                    = aws_lambda_function.authorize_call_lambda.invoke_arn
+
+#   authorizer_credentials            = aws_iam_role.invocation_role.arn
+
+#   authorizer_result_ttl_in_seconds  = var.authorizer_cache_time
+
+#   type                              = "TOKEN"
+
+#   identity_source                   = "method.request.header.Authorization"
+
+#   identity_validation_expression    = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
+
+# }
