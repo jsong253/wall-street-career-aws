@@ -9,7 +9,8 @@ const registrations = [
        "Start" : "2023-05-24",
        "End" : "2023-11-24",
        "Phone":"9522504286",
-       "Active" : true
+       "Active" : true,
+       "password":"Jianpassword"
     },
     {
         "FirstName": "Yang",
@@ -19,7 +20,8 @@ const registrations = [
         "Start" : "2023-05-24",
         "End" : "2023-11-24",
         "Phone":"9522504286",
-        "Active" : true
+        "Active" : true,
+        "password":"Yangpassword"
      }
 ];
 
@@ -33,10 +35,40 @@ const movies = [
 
 exports.handler = async (event) => {
    console.log(`index.js registrations start`)
-   console.log(`event: ${JSON.stringify(event, null, 4)}`)
+   // console.log(`event: ${JSON.stringify(event, null, 4)}`)
+   console.log(`event.queryStringParameters: ${JSON.stringify(event.queryStringParameters, null, 4)}`)
 
    try{
       // need to check the passed in parameters and query the dynamoDB to see if there is a match in the registration table
+      if (!event.queryStringParameters) {
+
+         return {
+   
+           body: 'Query params are required',
+   
+           headers: {
+   
+             'Content-Type': 'application/json',
+   
+             'Access-Control-Allow-Origin': process.env.CORS_ALLOWED_ORIGIN
+   
+           },
+   
+           statusCode: 400
+   
+         }
+   
+      }
+
+      const {email, password} = event.queryStringParameters          // destructuring to get passed in query info
+      console.log(`email: ${email}`)
+      console.log(`password: ${password}`)
+
+      // TODO: do a dynamoDB query
+      const filteredRegistrations =  registrations.filter(function(reg) {
+         return reg.Email == email && reg.password==password;
+       });
+       
       return {
          statusCode: 200,
          headers: {
@@ -45,7 +77,7 @@ exports.handler = async (event) => {
             "Access-Control-Allow-Origin" : "*",
             "Access-Control-Allow-Methods": "OPTIONS,GET"
          },
-         body:  JSON.stringify({ movies }), //sending the array of registrations as stringified JSON in the response
+         body:  JSON.stringify({ filteredRegistrations }), //sending the array of registrations as stringified JSON in the response
       };
    }
    catch(e){
