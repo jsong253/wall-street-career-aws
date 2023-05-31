@@ -563,3 +563,7 @@ Tue May 30 01:31:59 UTC 2023 : Method response body after transformations:
 Tue May 30 01:31:59 UTC 2023 : Method response headers: {Access-Control-Allow-Headers=Content-Type, Access-Control-Allow-Methods=GET,OPTIONS, Access-Control-Allow-Origin=*, Content-Type=application/json}
 Tue May 30 01:31:59 UTC 2023 : Successfully completed execution
 Tue May 30 01:31:59 UTC 2023 : Method completed with status: 200
+
+# postman test:
+https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations?email=songjianzhong16@gmail.com&password=Jianpassword
+
