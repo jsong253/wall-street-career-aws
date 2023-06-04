@@ -47,14 +47,14 @@
 
 
 // archive lambda code without s3
-resource "aws_lambda_function" "lambda_function" {
-  filename = data.archive_file.get_registrations_lambda_archive_file.output_path
-  function_name    = var.lambda_function_name
-  description      = var.lambda_function_name
+resource "aws_lambda_function" "get_lambda_function" {
+  filename = data.archive_file.get_registrations_get_lambda_archive_file.output_path
+  function_name    = var.get_lambda_function_name
+  description      = var.get_lambda_function_name
   runtime          = "nodejs14.x"
-  handler          = "modules/lambda_function/index.handler"
-  source_code_hash = data.archive_file.get_registrations_lambda_archive_file.output_base64sha256        
-  role             = aws_iam_role.lambda_execution_role.arn
+  handler          = "modules/get_lambda_function/index.handler"
+  source_code_hash = data.archive_file.get_registrations_get_lambda_archive_file.output_base64sha256        
+  role             = aws_iam_role.get_lambda_execution_role.arn
 
   environment{
     variables={
@@ -67,12 +67,13 @@ resource "aws_lambda_function" "lambda_function" {
     }
   }
 }
-resource "aws_cloudwatch_log_group" "lambda_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
+resource "aws_cloudwatch_log_group" "get_lambda_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.get_lambda_function.function_name}"
   retention_in_days = var.retention_in_days
 }
-resource "aws_iam_role" "lambda_execution_role" {
-  name = "lambda_execution_role_${var.lambda_function_name}"
+
+resource "aws_iam_role" "get_lambda_execution_role" {
+  name = "lambda_execution_role_${var.get_lambda_function_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -86,18 +87,18 @@ resource "aws_iam_role" "lambda_execution_role" {
     ]
   })
 }
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
-  role       = aws_iam_role.lambda_execution_role.name
+resource "aws_iam_role_policy_attachment" "get_lambda_policy" {
+  role       = aws_iam_role.get_lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 // alternate way to archive lambda without using s3 bucket to store lambda zip file
 // used without s3
-data "archive_file" "get_registrations_lambda_archive_file" {
+data "archive_file" "get_registrations_get_lambda_archive_file" {
   type        = "zip"
-  output_path = "${path.module}/get_registrations_lambda_archive_file.zip"
+  output_path = "${path.module}/get_registrations_get_lambda_archive_file.zip"
   source {
-    content   = "${file("terraform/modules/lambda_function/index.js")}"         // must be the full path
-    filename  = "modules/lambda_function/index.js"
+    content   = "${file("terraform/modules/get_lambda_function/index.js")}"         // must be the full path
+    filename  = "modules/get_lambda_function/index.js"
   }
 }

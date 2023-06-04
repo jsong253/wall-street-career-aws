@@ -2,24 +2,46 @@
 resource "aws_api_gateway_rest_api" "rest_api"{
     name = var.rest_api_name
     description="AWS rest api endpoints API Gateway"
-
 }
 
-resource "aws_api_gateway_resource" "rest_api_resource" {
+// get-registrations endpoint
+resource "aws_api_gateway_resource" "rest_api_get_resource" {
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   parent_id = aws_api_gateway_rest_api.rest_api.root_resource_id
-  path_part = "registrations"
+  path_part = "get-registrations"
+}
+
+resource "aws_api_gateway_request_validator" "rest_api_get_method_validator" {
+  name                        = "get_registrations-method-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
+  validate_request_body       = false
+  validate_request_parameters = true
+}
+
+resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
+  name                              = "api-gateway-authorizer-${var.env}"
+  rest_api_id                       = aws_api_gateway_rest_api.rest_api.id
+  // authorizer_uri                    = aws_lambda_function.authorize_lambda.invoke_arn
+  authorizer_uri                    = var.authorize_lambda_function_arn
+
+  // authorizer_credentials            = aws_iam_role.invocation_role.arn
+  authorizer_credentials            = var.invocation_role_arn
+  
+  //authorizer_result_ttl_in_seconds  = var.authorizer_cache_time
+  authorizer_result_ttl_in_seconds  = 3600
+  type                              = "TOKEN"
+  identity_source                   = "method.request.header.Authorization"
+  identity_validation_expression    = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
 }
 
 resource "aws_api_gateway_method" "rest_api_get_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
   http_method = "GET"
   authorization = "NONE"            // "CUSTOM"
   
   request_validator_id = aws_api_gateway_request_validator.rest_api_get_method_validator.id
-
-  // authorizer_id        = aws_api_gateway_authorizer.rest_api_get_method_validator_authorizer.id
+  authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id
 
   request_parameters   = {
     "method.request.querystring.email"          = false,
@@ -31,55 +53,75 @@ resource "aws_api_gateway_method" "rest_api_get_method"{
 
 resource "aws_api_gateway_integration" "rest_api_get_method_integration" {
   rest_api_id             = aws_api_gateway_rest_api.rest_api.id
-  resource_id             = aws_api_gateway_resource.rest_api_resource.id
+  resource_id             = aws_api_gateway_resource.rest_api_get_resource.id
   http_method             = aws_api_gateway_method.rest_api_get_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = var.lambda_function_arn
+  uri                     = var.get_lambda_function_arn
   connection_type         = "INTERNET"
 }
 
 resource "aws_api_gateway_method_response" "rest_api_get_method_response_200"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
   http_method = aws_api_gateway_method.rest_api_get_method.http_method
   status_code = "200"
 }
 
 resource "aws_api_gateway_integration_response" "rest_api_get_method_integration_response_200" {
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
   http_method = aws_api_gateway_integration.rest_api_get_method_integration.http_method
   status_code = aws_api_gateway_method_response.rest_api_get_method_response_200.status_code
   response_templates = {
     "application/json" = jsonencode({
-      body = "Hello from the registrations API!"
+      body = "Hello from the get-registrations API!"
     })
   }
 } 
 
-//  Creating a lambda resource based policy to allow API gateway to invoke the lambda function:
-resource "aws_lambda_permission" "api_gateway_lambda" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+// Creating a authorize lambda resource based policy to allow API gateway to invoke the authorize lambda function:
+resource "aws_lambda_permission" "api_gateway_authorize_lambda" {
+  statement_id  = "AllowExecutionAuthorizeLambdaFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = var.lambda_function_name
+  function_name = var.authorize_lambda_function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "arn:aws:execute-api:${var.api_gateway_region}:${var.api_gateway_account_id}:${aws_api_gateway_rest_api.rest_api.id}/*/${aws_api_gateway_method.rest_api_get_method.http_method}${aws_api_gateway_resource.rest_api_resource.path}"
+  source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/authorizers/${aws_api_gateway_authorizer.rest_api_authorizer.id}"
+  depends_on    = [aws_api_gateway_rest_api.rest_api, aws_api_gateway_authorizer.rest_api_authorizer]
+}
+
+//  Creating a lambda resource based policy to allow API gateway to invoke the lambda function:
+resource "aws_lambda_permission" "api_gateway_get_lambda" {
+  statement_id  = "AllowExecutionGetLambdaFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = var.get_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.api_gateway_region}:${var.api_gateway_account_id}:${aws_api_gateway_rest_api.rest_api.id}/*/${aws_api_gateway_method.rest_api_get_method.http_method}${aws_api_gateway_resource.rest_api_get_resource.path}"
+  // source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/*/*"
+  depends_on    = [aws_api_gateway_rest_api.rest_api, aws_api_gateway_method.rest_api_get_method, aws_api_gateway_resource.rest_api_get_resource]
 }
 
 resource "aws_api_gateway_deployment" "rest_api_deployment" {
   rest_api_id   = aws_api_gateway_rest_api.rest_api.id
   depends_on  =[
-    aws_api_gateway_resource.rest_api_resource,
+    aws_api_gateway_resource.rest_api_get_resource,
     aws_api_gateway_method.rest_api_get_method,
-    aws_api_gateway_integration.rest_api_get_method_integration
+    aws_api_gateway_integration.rest_api_get_method_integration,
+    
+    # aws_api_gateway_resource.rest_api_create_resource,
+    # aws_api_gateway_method.rest_api_create_method,
+    # aws_api_gateway_integration.rest_api_create_method_integration
   ]
 
   triggers      = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.rest_api_resource.id,
+      aws_api_gateway_resource.rest_api_get_resource.id,
       aws_api_gateway_method.rest_api_get_method.id,
-      aws_api_gateway_integration.rest_api_get_method_integration.id
+      aws_api_gateway_integration.rest_api_get_method_integration.id,
+      
+      # aws_api_gateway_resource.rest_api_create_resource.id,
+      # aws_api_gateway_method.rest_api_create_method.id,
+      # aws_api_gateway_integration.rest_api_create_method_integration.id
     ]))
   }
 
@@ -97,26 +139,30 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
   stage_name    = var.rest_api_stage_name
 
   depends_on  =[
-    aws_api_gateway_resource.rest_api_resource,
+    aws_api_gateway_resource.rest_api_get_resource,
     aws_api_gateway_method.rest_api_get_method,
-    aws_api_gateway_integration.rest_api_get_method_integration
+    aws_api_gateway_integration.rest_api_get_method_integration,
+    
+    # aws_api_gateway_resource.rest_api_create_resource,
+    # aws_api_gateway_method.rest_api_create_method,
+    # aws_api_gateway_integration.rest_api_create_method_integration,
   ]
 }
 
-# start of cors implementation
+# start of cors implementation for registrations end point
 # adds OPTIONS rest handler to API Gateway to deal with CORS pre-flight checks
-resource "aws_api_gateway_method" "registration_cors_resource_options_method" {
+resource "aws_api_gateway_method" "registration_cors_resource_options_get_method" {
   rest_api_id   = aws_api_gateway_rest_api.rest_api.id
-  resource_id   = aws_api_gateway_resource.rest_api_resource.id
+  resource_id   = aws_api_gateway_resource.rest_api_get_resource.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_method_response" "registration_cors_resource_options_method_response_200" {
-  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_method]
+resource "aws_api_gateway_method_response" "registration_cors_resource_options_get_method_response_200" {
+  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_get_method]
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
-  http_method = aws_api_gateway_method.registration_cors_resource_options_method.http_method
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_get_method.http_method
   status_code = 200
 
   response_models = {
@@ -131,11 +177,11 @@ resource "aws_api_gateway_method_response" "registration_cors_resource_options_m
   }
 }
 
-resource "aws_api_gateway_integration" "registration_cors_resource_options_integration" {
-  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_method]
+resource "aws_api_gateway_integration" "registration_cors_resource_options_get_integration" {
+  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_get_method]
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
-  http_method = aws_api_gateway_method.registration_cors_resource_options_method.http_method
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_get_method.http_method
 
   type        = "MOCK"                                                              # MOCK (not calling any real backend)
 
@@ -144,15 +190,15 @@ resource "aws_api_gateway_integration" "registration_cors_resource_options_integ
   }
 }
 
-resource "aws_api_gateway_integration_response" "registration_cors_resource_options_integraton_response" {
-  depends_on  = [aws_api_gateway_method_response.registration_cors_resource_options_method_response_200]
+resource "aws_api_gateway_integration_response" "registration_cors_resource_options_integraton_get_response" {
+  depends_on  = [aws_api_gateway_method_response.registration_cors_resource_options_get_method_response_200]
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
-  resource_id = aws_api_gateway_resource.rest_api_resource.id
-  http_method = aws_api_gateway_method.registration_cors_resource_options_method.http_method
-  status_code = aws_api_gateway_method_response.registration_cors_resource_options_method_response_200.status_code
+  resource_id = aws_api_gateway_resource.rest_api_get_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_get_method.http_method
+  status_code = aws_api_gateway_method_response.registration_cors_resource_options_get_method_response_200.status_code
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'",    # Take note of the double and single quotation marks in the response_parameters property
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type','Authorization'",    # Take note of the double and single quotation marks in the response_parameters property
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
     # "method.response.header.Access-Control-Allow-Origin"  = "'${var.cors_allowed_origin}'"
@@ -163,30 +209,3 @@ resource "aws_api_gateway_integration_response" "registration_cors_resource_opti
   }
 }
 # end of cors implementation
-
-resource "aws_api_gateway_request_validator" "rest_api_get_method_validator" {
-  name                        = "get_method-validator"
-  rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
-  validate_request_body       = false
-  validate_request_parameters = true
-}
-
-# resource "aws_api_gateway_authorizer" "rest_api_get_method_authorizer" {
-
-#   name                              = "api-gateway-authorizer-${var.env}"
-
-#   rest_api_id                       = aws_api_gateway_rest_api.rest_api.id
-
-#   authorizer_uri                    = aws_lambda_function.authorize_call_lambda.invoke_arn
-
-#   authorizer_credentials            = aws_iam_role.invocation_role.arn
-
-#   authorizer_result_ttl_in_seconds  = var.authorizer_cache_time
-
-#   type                              = "TOKEN"
-
-#   identity_source                   = "method.request.header.Authorization"
-
-#   identity_validation_expression    = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
-
-# }

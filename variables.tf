@@ -6,5 +6,11 @@ variable "region" {
 variable "account_id"{
   type          = string
   description   = "The account ID in which to create/manage resources"
-  default       =     "770646514888"
+  default       = "770646514888"
+}
+
+variable "env" {
+    type = string
+    description = "The region in which to create/manage resources"
+    default = "test"
 }

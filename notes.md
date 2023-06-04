@@ -569,3 +569,299 @@ https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations?email=
 
 # cURL command to generate okta token
 C:\Users\Yang>curl -X POST -u "0oa130rmd72AXU1zI0h8:SOWxjMxm-0l650KJe5fD41f4kxbvGqsBle74nwjp" -d "grant_type=client_credentials" https://travelers-dev.oktapreview.com/oauth2/aus130rsqrd51M6HQ0h8/v1/token -d "scope=filetracking-write"
+
+# Errors:
+Error: Unsupported attribute
+│ 
+│   on main.tf line 5, in module "api_gateway":
+│    5:   get_lambda_function_name = module.get_lambda_function.lambda_function_name
+│     ├────────────────
+│     │ module.get_lambda_function is a object
+│ 
+│ This object does not have an attribute named "lambda_function_name".
+resolved:
+ get_lambda_function_name = module.get_lambda_function.get_lambda_function_name
+╵
+╷
+│ Error: Unsupported attribute
+│
+│   on main.tf line 6, in module "api_gateway":
+│    6:   create_lambda_function_name = module.create_lambda_function.lambda_function_name
+│     ├────────────────
+│     │ module.create_lambda_function is a object
+│
+│ This object does not have an attribute named "lambda_function_name".
+╵resolved:
+ create_lambda_function_name = module.create_lambda_function.create_lambda_function_name
+╷
+│ Error: Unsupported attribute
+│
+│   on main.tf line 7, in module "api_gateway":
+│    7:   authorize_lambda_function_name = module.authorize_lambda_function.lambda_function_name
+│     ├────────────────
+│     │ module.authorize_lambda_function is a object
+│
+│ This object does not have an attribute named "lambda_function_name".
+╵ resolved:
+  authorize_lambda_function_name = module.authorize_lambda_function.authorize_lambda_function_name
+╷
+│ Error: Unsupported attribute
+│
+│   on main.tf line 8, in module "api_gateway":
+│    8:   get_lambda_function_arn = module.get_lambda_function.lambda_function_arn
+│     ├────────────────
+│     │ module.get_lambda_function is a object
+│
+│ This object does not have an attribute named "lambda_function_arn".
+╵ resolved:
+  get_lambda_function_arn = module.get_lambda_function.get_lambda_function_arn
+╷
+│ Error: Unsupported attribute
+│ A managed resource "aws_api_gateway_stage" "rest_api_stage" has not been declared in module.api_gateway.
+╵
+╷
+│ Error: Reference to undeclared resource
+│
+│   on terraform\modules\api_gateway\outputs.tf line 9, in output "rest_api_url":
+│    9:   value = "${aws_api_gateway_deployment.rest_api_deployment.invoke_url}${aws_api_gateway_stage.rest_api_stage.stage_name}${aws_api_gateway_resource.rest_api_resource.path}"
+│
+│ A managed resource "aws_api_gateway_resource" "rest_api_resource" has not been declared in module.api_gateway.
+╵
+PS C:\project area\wall-street-career-aws>
+
+# error when generate terraform plan:
+ Error: Cycle: module.api_gateway.aws_lambda_permission.api_gateway_get_lambda, module.api_gateway.aws_lambda_permission.api_gateway_authorize_lambda, module.api_gateway.aws_api_gateway_method.rest_api_get_method (destroy deposed 7808b953), module.api_gateway.aws_api_gateway_resource.rest_api_resource (destroy), module.lambda_function.aws_cloudwatch_log_group.lambda_log_group (destroy), module.api_gateway.aws_api_gateway_integration_response.rest_api_get_method_integration_response_200, module.api_gateway.aws_api_gateway_request_validator.rest_api_get_method_validator, module.api_gateway.aws_api_gateway_deployment.rest_api_deployment (destroy deposed 386961dc), module.api_gateway.aws_api_gateway_deployment.rest_api_deployment, module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration, module.api_gateway.aws_api_gateway_stage.rest_api_stage, module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration (destroy deposed 38f455ab), module.lambda_function.aws_lambda_function.lambda_function (destroy), module.api_gateway.aws_api_gateway_method.rest_api_get_method, module.api_gateway.aws_api_gateway_method_response.rest_api_get_method_response_200
+
+ # errors when terraformapply
+ 
+│ Error: Cycle: module.lambda_function.aws_cloudwatch_log_group.lambda_log_group (destroy), module.api_gateway.aws_api_gateway_resource.rest_api_resource (destroy), module.api_gateway.aws_lambda_permission.api_gateway_get_lambda, module.api_gateway.aws_api_gateway_method.rest_api_get_method (destroy deposed 94754706), module.api_gateway.aws_api_gateway_deployment.rest_api_deployment (destroy deposed f284ab8c), module.api_gateway.aws_api_gateway_method_response.rest_api_get_method_response_200, module.api_gateway.aws_api_gateway_integration_response.rest_api_get_method_integration_response_200, module.api_gateway.aws_api_gateway_stage.rest_api_stage, module.api_gateway.aws_api_gateway_deployment.rest_api_deployment, module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration, module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration (destroy deposed d0a64b7e), module.lambda_function.aws_lambda_function.lambda_function (destroy), module.api_gateway.aws_api_gateway_request_validator.rest_api_get_method_validator, module.api_gateway.aws_api_gateway_method.rest_api_get_method
+│
+# resolve Error: Cycle.  delete everything from aws console and run terraform int, validate, plan, and apply to generate new rest api gateway
+
+# new error after deleting everything and do terraform apply:
+│ Error: Error creating API Gateway Integration Response: BadRequestException: Invalid mapping expression specified: Validation Result: warnings : [], errors : [Invalid mapping expression specified: 'Content-Type',Authorization]
+│
+│   with module.api_gateway.aws_api_gateway_integration_response.registration_cors_resource_options_integraton_get_response,
+│   on terraform\modules\api_gateway\rest_api.tf line 193, in resource "aws_api_gateway_integration_response" "registration_cors_resource_options_integraton_get_response":
+│  193: resource "aws_api_gateway_integration_response" "registration_cors_resource_options_integraton_get_response" {
+
+# resolve: add single quote for 'Authorization'
+   "method.response.header.Access-Control-Allow-Headers" = "'Content-Type','Authorization'", 
+
+# error: 
+  │ Error: "authorizer_credentials" (aws_iam_role.arn:aws:iam::770646514888:role/lambda_execution_role_Authorize-Registrations-Lambda) is an invalid ARN: arn: invalid prefix
+│
+│   with module.api_gateway.aws_api_gateway_authorizer.rest_api_authorizer,
+│   on terraform\modules\api_gateway\rest_api.tf line 28, in resource "aws_api_gateway_authorizer" "rest_api_authorizer":
+│   28:   authorizer_credentials            = "aws_iam_role.${var.invocation_role_arn}"
+
+# resolved:  authorizer_credentials            = var.invocation_role_arn
+
+
+# success terraform apply
+PS C:\project area\wall-street-career-aws> terraform apply --auto-approve
+module.authorize_lambda_function.data.archive_file.get_registrations_authorize_lambda_archive_file: Reading...
+module.get_lambda_function.data.archive_file.get_registrations_get_lambda_archive_file: Reading...
+module.authorize_lambda_function.data.archive_file.get_registrations_authorize_lambda_archive_file: Read complete after 0s [id=1a42f5912ca4cc73ecff455c2e3b92e09b213e38]
+module.get_lambda_function.data.archive_file.get_registrations_get_lambda_archive_file: Read complete after 0s [id=f42f1373476ed3d3504cd47c8afb53d35debf345]
+module.get_lambda_function.aws_iam_role.get_lambda_execution_role: Refreshing state... [id=lambda_execution_role_Get-Registrations-Lambda]
+module.authorize_lambda_function.aws_iam_role.authorize_lambda_execution_role: Refreshing state... [id=lambda_execution_role_Authorize-Registrations-Lambda]
+module.get_lambda_function.aws_iam_role_policy_attachment.get_lambda_policy: Refreshing state... [id=lambda_execution_role_Get-Registrations-Lambda-20230604222311919400000002]
+module.get_lambda_function.aws_lambda_function.get_lambda_function: Refreshing state... [id=Get-Registrations-Lambda]
+module.authorize_lambda_function.aws_iam_role_policy_attachment.authorize_lambda_policy: Refreshing state... [id=lambda_execution_role_Authorize-Registrations-Lambda-20230604222311909900000001]
+module.authorize_lambda_function.aws_lambda_function.authorize_lambda_function: Refreshing state... [id=Authorize-Registrations-Lambda]
+module.get_lambda_function.aws_cloudwatch_log_group.get_lambda_log_group: Refreshing state... [id=/aws/lambda/Get-Registrations-Lambda]
+module.authorize_lambda_function.aws_cloudwatch_log_group.authorize_lambda_log_group: Refreshing state... [id=/aws/lambda/Authorize-Registrations-Lambda]
+module.api_gateway.aws_api_gateway_rest_api.rest_api: Refreshing state... [id=gf2dkci442]
+module.api_gateway.aws_api_gateway_resource.rest_api_get_resource: Refreshing state... [id=zwochp]
+module.api_gateway.aws_api_gateway_request_validator.rest_api_get_method_validator: Refreshing state... [id=thnuyk]
+module.api_gateway.aws_api_gateway_method.registration_cors_resource_options_get_method: Refreshing state... [id=agm-gf2dkci442-zwochp-OPTIONS]
+module.api_gateway.aws_api_gateway_deployment.rest_api_deployment: Refreshing state... [id=okjjow]
+module.api_gateway.aws_api_gateway_method_response.registration_cors_resource_options_get_method_response_200: Refreshing state... [id=agmr-gf2dkci442-zwochp-OPTIONS-200]
+module.api_gateway.aws_api_gateway_integration.registration_cors_resource_options_get_integration: Refreshing state... [id=agi-gf2dkci442-zwochp-OPTIONS]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the last "terraform apply" which may have affected this plan:
+
+  # module.api_gateway.aws_api_gateway_deployment.rest_api_deployment has been deleted
+  - resource "aws_api_gateway_deployment" "rest_api_deployment" {
+      - id            = "okjjow" -> null
+      - invoke_url    = "https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/" -> null
+        # (5 unchanged attributes hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the relevant attributes using ignore_changes, the following plan may    
+include actions to undo or respond to these changes.
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:        
+  + create
+
+Terraform will perform the following actions:
+
+  # module.api_gateway.aws_api_gateway_authorizer.rest_api_authorizer will be created
+  + resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
+      + authorizer_credentials           = "arn:aws:iam::770646514888:role/lambda_execution_role_Authorize-Registrations-Lambda"
+      + authorizer_result_ttl_in_seconds = 3600
+      + authorizer_uri                   = "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:770646514888:function:Authorize-Registrations-Lambda/invocations"
+      + id                               = (known after apply)
+      + identity_source                  = "method.request.header.Authorization"
+      + identity_validation_expression   = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
+      + name                             = "api-gateway-authorizer-test"
+      + rest_api_id                      = "gf2dkci442"
+      + type                             = "TOKEN"
+    }
+
+  # module.api_gateway.aws_api_gateway_deployment.rest_api_deployment will be created
+  + resource "aws_api_gateway_deployment" "rest_api_deployment" {
+      + created_date  = (known after apply)
+      + execution_arn = (known after apply)
+      + id            = (known after apply)
+      + invoke_url    = (known after apply)
+      + rest_api_id   = "gf2dkci442"
+      + triggers      = (known after apply)
+      + variables     = {
+          + "deploy_ver" = "1"
+        }
+    }
+
+  # module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration will be created
+  + resource "aws_api_gateway_integration" "rest_api_get_method_integration" {
+      + cache_namespace         = (known after apply)
+      + connection_type         = "INTERNET"
+      + http_method             = "GET"
+      + id                      = (known after apply)
+      + integration_http_method = "POST"
+      + passthrough_behavior    = (known after apply)
+      + resource_id             = "zwochp"
+      + rest_api_id             = "gf2dkci442"
+      + timeout_milliseconds    = 29000
+      + type                    = "AWS_PROXY"
+      + uri                     = "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:770646514888:function:Get-Registrations-Lambda/invocations"
+    }
+
+  # module.api_gateway.aws_api_gateway_integration_response.registration_cors_resource_options_integraton_get_response will be created
+  + resource "aws_api_gateway_integration_response" "registration_cors_resource_options_integraton_get_response" {
+      + http_method         = "OPTIONS"
+      + id                  = (known after apply)
+      + resource_id         = "zwochp"
+      + response_parameters = {
+          + "method.response.header.Access-Control-Allow-Headers" = "'Content-Type','Authorization'"
+          + "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
+          + "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+        }
+      + response_templates  = {
+          + "application/json" = ""
+        }
+      + rest_api_id         = "gf2dkci442"
+      + status_code         = "200"
+    }
+
+  # module.api_gateway.aws_api_gateway_integration_response.rest_api_get_method_integration_response_200 will be created
+  + resource "aws_api_gateway_integration_response" "rest_api_get_method_integration_response_200" {
+      + http_method        = "GET"
+      + id                 = (known after apply)
+      + resource_id        = "zwochp"
+      + response_templates = {
+          + "application/json" = jsonencode(
+                {
+                  + body = "Hello from the get-registrations API!"
+                }
+            )
+        }
+      + rest_api_id        = "gf2dkci442"
+      + status_code        = "200"
+    }
+
+  # module.api_gateway.aws_api_gateway_method.rest_api_get_method will be created
+  + resource "aws_api_gateway_method" "rest_api_get_method" {
+      + api_key_required     = false
+      + authorization        = "NONE"
+      + authorizer_id        = (known after apply)
+      + http_method          = "GET"
+      + id                   = (known after apply)
+      + request_parameters   = {
+          + "method.request.querystring.email"    = false
+          + "method.request.querystring.password" = false
+        }
+      + request_validator_id = "thnuyk"
+      + resource_id          = "zwochp"
+      + rest_api_id          = "gf2dkci442"
+    }
+
+  # module.api_gateway.aws_api_gateway_method_response.rest_api_get_method_response_200 will be created
+  + resource "aws_api_gateway_method_response" "rest_api_get_method_response_200" {
+      + http_method = "GET"
+      + id          = (known after apply)
+      + resource_id = "zwochp"
+      + rest_api_id = "gf2dkci442"
+      + status_code = "200"
+    }
+
+  # module.api_gateway.aws_api_gateway_stage.rest_api_stage will be created
+  + resource "aws_api_gateway_stage" "rest_api_stage" {
+      + arn           = (known after apply)
+      + deployment_id = (known after apply)
+      + execution_arn = (known after apply)
+      + id            = (known after apply)
+      + invoke_url    = (known after apply)
+      + rest_api_id   = "gf2dkci442"
+      + stage_name    = "prod"
+      + tags_all      = (known after apply)
+      + web_acl_arn   = (known after apply)
+    }
+
+  # module.api_gateway.aws_lambda_permission.api_gateway_authorize_lambda will be created
+  + resource "aws_lambda_permission" "api_gateway_authorize_lambda" {
+      + action        = "lambda:InvokeFunction"
+      + function_name = "Authorize-Registrations-Lambda"
+      + id            = (known after apply)
+      + principal     = "apigateway.amazonaws.com"
+      + source_arn    = (known after apply)
+      + statement_id  = "AllowExecutionAuthorizeLambdaFromAPIGateway"
+    }
+
+  # module.api_gateway.aws_lambda_permission.api_gateway_get_lambda will be created
+  + resource "aws_lambda_permission" "api_gateway_get_lambda" {
+      + action        = "lambda:InvokeFunction"
+      + function_name = "Get-Registrations-Lambda"
+      + id            = (known after apply)
+      + principal     = "apigateway.amazonaws.com"
+      + source_arn    = "arn:aws:execute-api:us-east-1:770646514888:gf2dkci442/*/GET/get-registrations"
+      + statement_id  = "AllowExecutionGetLambdaFromAPIGateway"
+    }
+
+Plan: 10 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ rest_api_url = "https://aaiiuxs4r8.execute-api.us-east-1.amazonaws.com/prod/registrations" -> (known after apply)
+module.api_gateway.aws_api_gateway_authorizer.rest_api_authorizer: Creating...
+module.api_gateway.aws_api_gateway_integration_response.registration_cors_resource_options_integraton_get_response: Creating...
+module.api_gateway.aws_api_gateway_integration_response.registration_cors_resource_options_integraton_get_response: Creation complete after 1s [id=agir-gf2dkci442-zwochp-OPTIONS-200]
+module.api_gateway.aws_api_gateway_authorizer.rest_api_authorizer: Creation complete after 1s [id=q8togz]
+module.api_gateway.aws_lambda_permission.api_gateway_authorize_lambda: Creating...
+module.api_gateway.aws_api_gateway_method.rest_api_get_method: Creating...
+module.api_gateway.aws_api_gateway_method.rest_api_get_method: Creation complete after 0s [id=agm-gf2dkci442-zwochp-GET]
+module.api_gateway.aws_api_gateway_method_response.rest_api_get_method_response_200: Creating...
+module.api_gateway.aws_lambda_permission.api_gateway_get_lambda: Creating...
+module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration: Creating...
+module.api_gateway.aws_api_gateway_method_response.rest_api_get_method_response_200: Creation complete after 0s [id=agmr-gf2dkci442-zwochp-GET-200]
+module.api_gateway.aws_lambda_permission.api_gateway_authorize_lambda: Creation complete after 0s [id=AllowExecutionAuthorizeLambdaFromAPIGateway]
+module.api_gateway.aws_api_gateway_integration.rest_api_get_method_integration: Creation complete after 0s [id=agi-gf2dkci442-zwochp-GET]
+module.api_gateway.aws_api_gateway_deployment.rest_api_deployment: Creating...
+module.api_gateway.aws_api_gateway_integration_response.rest_api_get_method_integration_response_200: Creating...
+module.api_gateway.aws_lambda_permission.api_gateway_get_lambda: Creation complete after 0s [id=AllowExecutionGetLambdaFromAPIGateway]
+module.api_gateway.aws_api_gateway_integration_response.rest_api_get_method_integration_response_200: Creation complete after 0s [id=agir-gf2dkci442-zwochp-GET-200]
+module.api_gateway.aws_api_gateway_deployment.rest_api_deployment: Creation complete after 1s [id=x7xota]
+module.api_gateway.aws_api_gateway_stage.rest_api_stage: Creating...
+module.api_gateway.aws_api_gateway_stage.rest_api_stage: Creation complete after 0s [id=ags-gf2dkci442-prod]
+
+Apply complete! Resources: 10 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+rest_api_url = "https://gf2dkci442.execute-api.us-east-1.amazonaws.com/prod/get-registrations"
+PS C:\project area\wall-street-career-aws>

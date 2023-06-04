@@ -3,10 +3,10 @@ variable "s3_bucket_name" {
   description = "The name of the S3 bucket to store the Lambda function code"
   default     = "s3-for-api-gateway-lambda-wsc-jlyaa" // must be unique - change this to something unique
 }
-variable "lambda_function_name" {
+variable "get_lambda_function_name" {
   type        = string
-  description = "The name of the Lambda function"
-  default     = "RegistrationsLambda"
+  description = "The name of the Lambda function for get-registrations endpoint"
+  default     = "Get-Registrations-Lambda"
 }
 
 variable "retention_in_days" {

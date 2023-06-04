@@ -34,7 +34,7 @@ const movies = [
 ];
 
 exports.handler = async (event) => {
-   console.log(`index.js registrations start`)
+   console.log(`index.js get-registrations start`)
    // console.log(`event: ${JSON.stringify(event, null, 4)}`)
    console.log(`event.queryStringParameters: ${JSON.stringify(event.queryStringParameters, null, 4)}`)
 
@@ -84,6 +84,6 @@ exports.handler = async (event) => {
       console.log(`error: ${JSON.stringify(e, null, 4)}`)
    }
    finally{
-      console.log(`index.js registrations end`)
+      console.log(`index.js get-registrations end`)
    }
 };
