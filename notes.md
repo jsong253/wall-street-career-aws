@@ -865,3 +865,13 @@ Outputs:
 
 rest_api_url = "https://gf2dkci442.execute-api.us-east-1.amazonaws.com/prod/get-registrations"
 PS C:\project area\wall-street-career-aws>
+
+
+# error when adding create-registrations end point
+╷
+│ Error: error creating Lambda Function (1): ValidationException: 
+│       status code: 400, request id: 5b7c64ac-7a2b-480a-b47f-f51648bf2432
+│
+│   with module.create_lambda_function.aws_lambda_function.create_lambda_function,
+│   on terraform\modules\create_lambda_function\lambda.tf line 2, in resource "aws_lambda_function" "create_lambda_function":      
+│    2: resource "aws_lambda_function" "create_lambda_function" {

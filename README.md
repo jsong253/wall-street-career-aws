@@ -229,3 +229,5 @@ module.api_gateway.aws_api_gateway_rest_api.rest_api: Destruction complete after
 Destroy complete! Resources: 6 destroyed.
 PS C:\project area\wall-street-career-aws>
 
+# install @okta/jwt-verifier in the scaffold folder
+

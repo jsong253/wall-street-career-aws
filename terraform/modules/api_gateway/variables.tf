@@ -35,18 +35,18 @@ variable "get_lambda_function_arn" {
   description = "The ARN of the Lambda function"
 } 
 
-# //value comes from main.tf
-# variable "create_lambda_function_name" {
-#   type        = string
-#   description = "The name of the Lambda function"
-# }
+//value comes from main.tf
+variable "create_lambda_function_name" {
+  type        = string
+  description = "The name of the Lambda function"
+}
 
 
-# //value comes from main.tf
-# variable "create_lambda_function_arn" {
-#   type        = string
-#   description = "The ARN of the Lambda function"
-# } 
+//value comes from main.tf
+variable "create_lambda_function_arn" {
+  type        = string
+  description = "The ARN of the Lambda function"
+} 
 
 //value comes from main.tf
 variable "authorize_lambda_function_arn" {

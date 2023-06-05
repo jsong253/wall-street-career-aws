@@ -108,9 +108,9 @@ resource "aws_api_gateway_deployment" "rest_api_deployment" {
     aws_api_gateway_method.rest_api_get_method,
     aws_api_gateway_integration.rest_api_get_method_integration,
     
-    # aws_api_gateway_resource.rest_api_create_resource,
-    # aws_api_gateway_method.rest_api_create_method,
-    # aws_api_gateway_integration.rest_api_create_method_integration
+    aws_api_gateway_resource.rest_api_create_resource,
+    aws_api_gateway_method.rest_api_create_method,
+    aws_api_gateway_integration.rest_api_create_method_integration
   ]
 
   triggers      = {
@@ -119,9 +119,9 @@ resource "aws_api_gateway_deployment" "rest_api_deployment" {
       aws_api_gateway_method.rest_api_get_method.id,
       aws_api_gateway_integration.rest_api_get_method_integration.id,
       
-      # aws_api_gateway_resource.rest_api_create_resource.id,
-      # aws_api_gateway_method.rest_api_create_method.id,
-      # aws_api_gateway_integration.rest_api_create_method_integration.id
+      aws_api_gateway_resource.rest_api_create_resource.id,
+      aws_api_gateway_method.rest_api_create_method.id,
+      aws_api_gateway_integration.rest_api_create_method_integration.id
     ]))
   }
 
@@ -143,9 +143,9 @@ resource "aws_api_gateway_stage" "rest_api_stage" {
     aws_api_gateway_method.rest_api_get_method,
     aws_api_gateway_integration.rest_api_get_method_integration,
     
-    # aws_api_gateway_resource.rest_api_create_resource,
-    # aws_api_gateway_method.rest_api_create_method,
-    # aws_api_gateway_integration.rest_api_create_method_integration,
+    aws_api_gateway_resource.rest_api_create_resource,
+    aws_api_gateway_method.rest_api_create_method,
+    aws_api_gateway_integration.rest_api_create_method_integration
   ]
 }
 
@@ -200,6 +200,153 @@ resource "aws_api_gateway_integration_response" "registration_cors_resource_opti
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type','Authorization'",    # Take note of the double and single quotation marks in the response_parameters property
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    # "method.response.header.Access-Control-Allow-Origin"  = "'${var.cors_allowed_origin}'"
+  }
+
+  response_templates = {
+    "application/json" = ""
+  }
+}
+# end of cors implementation
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////start create-registrations endpoint /////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// create-registrations endpoint
+
+resource "aws_api_gateway_request_validator" "rest_api_create_method_validator" {
+  name                        = "create_registration-method-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
+  validate_request_body       = true
+  validate_request_parameters = false
+}
+
+resource "aws_api_gateway_resource" "rest_api_create_resource" {
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  parent_id = aws_api_gateway_rest_api.rest_api.root_resource_id
+  path_part = "create-registrations"
+}
+
+resource "aws_api_gateway_method" "rest_api_create_method"{
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = "POST"
+  authorization = "NONE"            // "CUSTOM"
+  
+  request_validator_id = aws_api_gateway_request_validator.rest_api_create_method_validator.id
+  authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id
+
+  # request_models = {
+  #   "application/json" = aws_api_gateway_model.rest_api_create_method__model.name
+  # }
+
+  api_key_required     = false
+}
+
+resource "aws_api_gateway_integration" "rest_api_create_method_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.rest_api.id
+  resource_id             = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method             = aws_api_gateway_method.rest_api_create_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.create_lambda_function_arn
+  connection_type         = "INTERNET"
+}
+
+# resource "aws_api_gateway_model" "rest_api_create_method__model" {
+#   rest_api_id  = aws_api_gateway_rest_api.rest_api.id
+#   name         = "create-registrations-model${upper(var.env)}"
+#   description  = "create-registrations Message Model in JSON format"
+#   content_type = "application/json"
+#   schema       = file("common/schema/publishStatus.json")
+# }
+
+
+resource "aws_api_gateway_method_response" "rest_api_create_method_response_200"{
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = aws_api_gateway_method.rest_api_create_method.http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_integration_response" "rest_api_create_method_integration_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = aws_api_gateway_integration.rest_api_create_method_integration.http_method
+  status_code = aws_api_gateway_method_response.rest_api_create_method_response_200.status_code
+  response_templates = {
+    "application/json" = jsonencode({
+      body = "Hello from the registrations API!"
+    })
+  }
+} 
+
+//  Creating a lambda resource based policy to allow API gateway to invoke the lambda function:
+resource "aws_lambda_permission" "api_gateway_create_lambda" {
+  statement_id  = "AllowExecutionCreateLambdaFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = var.create_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.api_gateway_region}:${var.api_gateway_account_id}:${aws_api_gateway_rest_api.rest_api.id}/*/${aws_api_gateway_method.rest_api_create_method.http_method}${aws_api_gateway_resource.rest_api_create_resource.path}"
+
+  // source_arn    = "${aws_api_gateway_rest_api.rest_api.execution_arn}/*/*/*"
+  depends_on    = [aws_api_gateway_rest_api.rest_api, aws_api_gateway_method.rest_api_create_method, aws_api_gateway_resource.rest_api_create_resource]
+}
+
+# start of cors implementation for create-registrations
+# adds OPTIONS rest handler to API Gateway to deal with CORS pre-flight checks
+resource "aws_api_gateway_method" "registration_cors_resource_options_create_method" {
+  rest_api_id   = aws_api_gateway_rest_api.rest_api.id
+  resource_id   = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "registration_cors_resource_options_create_method_response_200" {
+  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_create_method]
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_create_method.http_method
+  status_code = 200
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true,
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "registration_cors_resource_options_create_integration" {
+  depends_on  = [aws_api_gateway_method.registration_cors_resource_options_create_method]
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_create_method.http_method
+
+  type        = "MOCK"                                                              # MOCK (not calling any real backend)
+
+  request_templates = {
+    "application/json" : "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "registration_cors_resource_options_create_integraton_response" {
+  depends_on  = [aws_api_gateway_method_response.registration_cors_resource_options_create_method_response_200]
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  resource_id = aws_api_gateway_resource.rest_api_create_resource.id
+  http_method = aws_api_gateway_method.registration_cors_resource_options_create_method.http_method
+  status_code = aws_api_gateway_method_response.registration_cors_resource_options_create_method_response_200.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type','Authorization'",    # Take note of the double and single quotation marks in the response_parameters property
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
     # "method.response.header.Access-Control-Allow-Origin"  = "'${var.cors_allowed_origin}'"
   }
