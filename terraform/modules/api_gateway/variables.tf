@@ -49,7 +49,7 @@ variable "create_lambda_function_arn" {
 } 
 
 //value comes from main.tf
-variable "authorize_lambda_function_arn" {
+variable "authorize_lambda_function_invoke_arn" {
   type        = string
   description = "The ARN of the Lambda function"
 }  
@@ -62,7 +62,7 @@ variable "rest_api_stage_name" {
 }
 
 //value comes from main.tf
-variable "invocation_role_arn" {
+variable "authorize_lambda_invocation_role_arn" {
   type        = string
 }
 

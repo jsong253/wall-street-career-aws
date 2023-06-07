@@ -1,4 +1,4 @@
-// archive lambda code without s3
+// https://registry.terraform.io/providers/hashicorp/aws/3.29.0/docs/resources/api_gateway_authorizer
 resource "aws_lambda_function" "authorize_lambda_function" {
   filename          = data.archive_file.get_registrations_authorize_lambda_archive_file.output_path
   function_name     = var.authorize_lambda_function_name
@@ -6,8 +6,9 @@ resource "aws_lambda_function" "authorize_lambda_function" {
   runtime           = "nodejs14.x"
   handler           = "modules/authorize_lambda_function/index.handler"
   source_code_hash  = data.archive_file.get_registrations_authorize_lambda_archive_file.output_base64sha256        
-  role              = aws_iam_role.authorize_lambda_execution_role.arn
-
+  // role              = aws_iam_role.authorize_lambda_execution_role.arn
+  role              = aws_iam_role.lambda.arn
+  
   environment{
     variables={
         ENV="dev"
@@ -25,24 +26,25 @@ resource "aws_cloudwatch_log_group" "authorize_lambda_log_group" {
   retention_in_days = var.retention_in_days
 }
 
-resource "aws_iam_role" "authorize_lambda_execution_role" {
-  name = "lambda_execution_role_${var.authorize_lambda_function_name}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Sid    = ""
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      }
-    ]
-  })
+
+resource "aws_iam_role" "lambda" {
+  name = "demo-lambda"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
 }
-resource "aws_iam_role_policy_attachment" "authorize_lambda_policy" {
-  role       = aws_iam_role.authorize_lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+EOF
 }
 
 // alternate way to archive lambda without using s3 bucket to store lambda zip file
@@ -55,3 +57,44 @@ data "archive_file" "get_registrations_authorize_lambda_archive_file" {
     filename  = "modules/authorize_lambda_function/index.js"
   }
 }
+
+resource "aws_iam_role" "invocation_role" {
+  name = "api_gateway_auth_invocation"
+  path = "/"
+
+  assume_role_policy = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "apigateway.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  }
+  EOF
+}
+
+resource "aws_iam_role_policy" "invocation_policy" {
+  name = "default"
+  role = aws_iam_role.invocation_role.id
+
+  policy = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "lambda:InvokeFunction",
+        "Effect": "Allow",
+        "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
+      }
+    ]
+  }
+  EOF
+}
+
+

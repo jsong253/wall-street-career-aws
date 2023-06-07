@@ -875,3 +875,10 @@ PS C:\project area\wall-street-career-aws>
 │   with module.create_lambda_function.aws_lambda_function.create_lambda_function,
 │   on terraform\modules\create_lambda_function\lambda.tf line 2, in resource "aws_lambda_function" "create_lambda_function":      
 │    2: resource "aws_lambda_function" "create_lambda_function" {
+
+
+# error
+
+  Wed Jun 07 17:58:56 UTC 2023 : Execution failed due to configuration error: API Gateway does not have permission to assume the provided role arn:aws:iam::770646514888:role/lambda_execution_role_Authorize-Registrations-Lambda
+Wed Jun 07 17:58:56 UTC 2023 : Execution failed due to configuration error: Authorizer error
+Wed Jun 07 17:58:56 UTC 2023 : AuthorizerConfigurationException

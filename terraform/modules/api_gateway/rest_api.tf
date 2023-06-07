@@ -22,10 +22,10 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
   name                              = "api-gateway-authorizer-${var.env}"
   rest_api_id                       = aws_api_gateway_rest_api.rest_api.id
   // authorizer_uri                    = aws_lambda_function.authorize_lambda.invoke_arn
-  authorizer_uri                    = var.authorize_lambda_function_arn
+  authorizer_uri                    = var.authorize_lambda_function_invoke_arn     
 
   // authorizer_credentials            = aws_iam_role.invocation_role.arn
-  authorizer_credentials            = var.invocation_role_arn
+  authorizer_credentials            = var.authorize_lambda_invocation_role_arn
   
   //authorizer_result_ttl_in_seconds  = var.authorizer_cache_time
   authorizer_result_ttl_in_seconds  = 3600
@@ -38,7 +38,7 @@ resource "aws_api_gateway_method" "rest_api_get_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_get_resource.id
   http_method = "GET"
-  authorization = "NONE"            // "CUSTOM"
+  authorization = "CUSTOM"            // "CUSTOM"
   
   request_validator_id = aws_api_gateway_request_validator.rest_api_get_method_validator.id
   authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id
@@ -234,7 +234,7 @@ resource "aws_api_gateway_method" "rest_api_create_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_create_resource.id
   http_method = "POST"
-  authorization = "NONE"            // "CUSTOM"
+  authorization = "CUSTOM"            // "CUSTOM"
   
   request_validator_id = aws_api_gateway_request_validator.rest_api_create_method_validator.id
   authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id
