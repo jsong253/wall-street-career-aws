@@ -4,32 +4,18 @@
 // const { verifyToken, verifyBrowserToken } = require('../../scaffold/okta')
 const { verifyToken } = require('../../scaffold/okta')
 const { createLogger } = require('../../scaffold/createLogger')
-const logger = createLogger('authorize_lambda')
+const logger = createLogger('authorize_lambda_function')
 
- 
-
-exports.handler = async (event, _context) => {
-
+exports.handler = async (event) => {
   logger('authorize_lambda begin')
-
- 
 
   // const expectedAud = process.env.AUDIENCE
   const expectedAud = 'https://travelers-dev.oktapreview.com/oauth2/aus130rsqrd51M6HQ0h8'
   const browserAud = process.env.BROWSER_AUDIENCE
-
- 
-
   const tokenString = event.authorizationToken.replace(/bearer\s/ig, '').trim()
-
- 
-
   let authorized = false
 
- 
-
   try {
-
     // if (event.methodArn?.includes('get-upload-diagnostics')) {
 
     //   await verifyBrowserToken(tokenString, browserAud)
@@ -41,77 +27,39 @@ exports.handler = async (event, _context) => {
     // }
 
     await verifyToken(tokenString, expectedAud)
-
     authorized = true
-
   } catch (e) {
-
     logger('Token verification failed', { message: e })
-
   }
-
- 
 
   logger('authorize_lambda end')
-
- 
-
+  
   const authPolicy = {
-
     principalId: 'na',
-
     policyDocument: {
-
       Version: '2012-10-17',
-
       Statement: [
-
         {
-
           Action: 'execute-api:Invoke',
-
           Effect: 'Allow',
-
           Resource: event.methodArn
-
         }
-
       ]
-
     }
-
   }
-
- 
 
   const denyPolicy = {
-
     principalId: 'na',
-
     policyDocument: {
-
       Version: '2012-10-17',
-
       Statement: [
-
         {
-
           Action: 'execute-api:Invoke',
-
           Effect: 'Deny',
-
           Resource: event.methodArn
-
         }
-
       ]
-
     }
-
   }
-
- 
-
   return authorized ? authPolicy : denyPolicy
-
 }

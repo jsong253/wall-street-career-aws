@@ -1,4 +1,6 @@
 // https://registry.terraform.io/providers/hashicorp/aws/3.29.0/docs/resources/api_gateway_authorizer
+// authorizer not triggerred:
+// https://stackoverflow.com/questions/52549538/aws-api-gateway-custom-authorizer-not-invoked
 resource "aws_lambda_function" "authorize_lambda_function" {
   filename          = data.archive_file.get_registrations_authorize_lambda_archive_file.output_path
   function_name     = var.authorize_lambda_function_name
@@ -6,7 +8,6 @@ resource "aws_lambda_function" "authorize_lambda_function" {
   runtime           = "nodejs14.x"
   handler           = "modules/authorize_lambda_function/index.handler"
   source_code_hash  = data.archive_file.get_registrations_authorize_lambda_archive_file.output_base64sha256        
-  // role              = aws_iam_role.authorize_lambda_execution_role.arn
   role              = aws_iam_role.lambda.arn
   
   environment{
@@ -58,43 +59,47 @@ data "archive_file" "get_registrations_authorize_lambda_archive_file" {
   }
 }
 
+
+// do not format the policy 
 resource "aws_iam_role" "invocation_role" {
   name = "api_gateway_auth_invocation"
   path = "/"
 
   assume_role_policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "apigateway.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
-      }
-    ]
-  }
-  EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
+// do not format the policy 
 resource "aws_iam_role_policy" "invocation_policy" {
   name = "default"
   role = aws_iam_role.invocation_role.id
 
   policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "lambda:InvokeFunction",
-        "Effect": "Allow",
-        "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
-      }
-    ]
-  }
-  EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "lambda:InvokeFunction",
+      "Effect": "Allow",
+      "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
+    }
+  ]
 }
+EOF
+}
+
 
 

@@ -69,7 +69,7 @@ variable "authorize_lambda_invocation_role_arn" {
 variable "cors_allowed_origin" {
   type        = string
   description = "The allowed origins of the browser"
-  default     = "http://localhost:3000" 
+  default     = "http://localhost:3000"
 }
 
 variable "account_id"{

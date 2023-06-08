@@ -882,3 +882,24 @@ PS C:\project area\wall-street-career-aws>
   Wed Jun 07 17:58:56 UTC 2023 : Execution failed due to configuration error: API Gateway does not have permission to assume the provided role arn:aws:iam::770646514888:role/lambda_execution_role_Authorize-Registrations-Lambda
 Wed Jun 07 17:58:56 UTC 2023 : Execution failed due to configuration error: Authorizer error
 Wed Jun 07 17:58:56 UTC 2023 : AuthorizerConfigurationException
+
+
+# error:
+Error: "policy" contains an invalid JSON policy
+│
+│   with module.authorize_lambda_function.aws_iam_role_policy.invocation_policy,
+│   on terraform\modules\authorize_lambda_function\lambda.tf line 88, in resource "aws_iam_role_policy" "invocation_policy":
+│   88:   policy = <<EOF
+│   89:   {
+│   90:     "Version": "2012-10-17",
+│   91:     "Statement": [
+│   92:       {
+│   93:         "Action": "lambda:InvokeFunction",
+│   94:         "Effect": "Allow",
+│   95:         "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
+│   96:       }
+│   97:     ]
+│   98:   }
+│   99:   EOF
+│
+╵
