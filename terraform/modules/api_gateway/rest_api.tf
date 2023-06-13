@@ -31,7 +31,7 @@ resource "aws_api_gateway_authorizer" "rest_api_authorizer" {
   authorizer_result_ttl_in_seconds  = 3600                            // Defaults to 300
   type                              = "TOKEN"
   identity_source                   = "method.request.header.Authorization"
-  // identity_validation_expression    = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
+  identity_validation_expression    = "^(Bearer )[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+)$"
 }
 
 resource "aws_api_gateway_method" "rest_api_get_method"{

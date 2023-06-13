@@ -1,3 +1,22 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "4.0.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Configuration options
+  region                  = var.region
+  // profile                 = var.aws_profile
+  // shared_credentials_files = [var.shared_credentials_file]
+  default_tags {
+    tags = var.tags
+  }
+}
+
 module "api_gateway" {
   source = "./terraform/modules/api_gateway"
   api_gateway_region = var.region
@@ -26,5 +45,11 @@ module "create_lambda_function" {
 
 module "authorize_lambda_function" {
   source = "./terraform/modules/authorize_lambda_function"
+  common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
+}
+
+
+module "lambda_layer" {
+  source =  "./terraform/modules/lambda_layer"   
 }
 

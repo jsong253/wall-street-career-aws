@@ -2,30 +2,18 @@
 
 
 // const { verifyToken, verifyBrowserToken } = require('../../scaffold/okta')
-const { verifyToken } = require('../../scaffold/okta')
-const { createLogger } = require('../../scaffold/createLogger')
+const { verifyToken } = require('./okta')                 // gt it from lambda layer
+const { createLogger } = require('./createLogger')
 const logger = createLogger('authorize_lambda_function')
 
 exports.handler = async (event) => {
   logger('authorize_lambda begin')
 
-  // const expectedAud = process.env.AUDIENCE
   const expectedAud = 'https://travelers-dev.oktapreview.com/oauth2/aus130rsqrd51M6HQ0h8'
-  const browserAud = process.env.BROWSER_AUDIENCE
   const tokenString = event.authorizationToken.replace(/bearer\s/ig, '').trim()
   let authorized = false
 
   try {
-    // if (event.methodArn?.includes('get-upload-diagnostics')) {
-
-    //   await verifyBrowserToken(tokenString, browserAud)
-
-    // } else {
-
-    //   await verifyToken(tokenString, expectedAud)
-
-    // }
-
     await verifyToken(tokenString, expectedAud)
     authorized = true
   } catch (e) {

@@ -45,7 +45,6 @@
 #   role             = aws_iam_role.lambda_execution_role.arn
 # }
 
-
 // archive lambda code without s3
 resource "aws_lambda_function" "get_lambda_function" {
   filename = data.archive_file.get_registrations_get_lambda_archive_file.output_path

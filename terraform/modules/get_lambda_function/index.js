@@ -41,23 +41,14 @@ exports.handler = async (event) => {
    try{
       // need to check the passed in parameters and query the dynamoDB to see if there is a match in the registration table
       if (!event.queryStringParameters) {
-
          return {
-   
            body: 'Query params are required',
-   
            headers: {
-   
              'Content-Type': 'application/json',
-   
              'Access-Control-Allow-Origin': process.env.CORS_ALLOWED_ORIGIN
-   
            },
-   
            statusCode: 400
-   
          }
-   
       }
 
       const {email, password} = event.queryStringParameters          // destructuring to get passed in query info

@@ -14,3 +14,17 @@ variable "env" {
     description = "The region in which to create/manage resources"
     default = "test"
 }
+variable "shared_credentials_file" {
+  description = "Profile file with credentials to the AWS account"
+  type        = string
+  default     = "~/.aws/credentials"
+}
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default ={
+    application = "wall-street-carrer"
+    env         = "Test"
+  }
+}

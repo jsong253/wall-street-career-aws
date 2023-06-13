@@ -10,3 +10,9 @@ variable "retention_in_days" {
   description = "The retention days for the lambda log"
   default     = 30
 }
+
+// 
+variable "common_lambda_layer_arn"{
+  type = string
+  description = "the arn of the lambda layer for comon-lambda-layer"
+}
