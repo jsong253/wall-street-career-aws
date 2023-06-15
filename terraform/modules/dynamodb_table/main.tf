@@ -1,4 +1,7 @@
 // https://dynobase.dev/dynamodb-terraform/
+// https://medium.com/@jun711.g/how-to-set-time-to-live-attribute-for-amazon-dynamodb-entries-6b10ed16281#:~:text=Open%20up%20your%20AWS%20console,TTL%20button%20next%20to%20it.
+
+
 resource "aws_kms_key" "dynamo_kms_key" {
   description = "Encryption key for dynamo"
   enable_key_rotation = true

@@ -37,10 +37,18 @@ module "api_gateway" {
 
 module "get_lambda_function" {
   source = "./terraform/modules/get_lambda_function"
+  registration_table_name = module.dynamodb_registration_table.registration_table_id
+  registration_table_arn = module.dynamodb_registration_table.registration_table_arn
+  region = var.region
+  env = var.env
 }
 
 module "create_lambda_function" {
   source = "./terraform/modules/create_lambda_function"
+  registration_table_name = module.dynamodb_registration_table.registration_table_id
+  registration_table_arn = module.dynamodb_registration_table.registration_table_arn
+  region = var.region
+  env = var.env
 }
 
 module "authorize_lambda_function" {
@@ -52,7 +60,7 @@ module "lambda_layer" {
   source =  "./terraform/modules/lambda_layer"   
 }
 
-module  "registration_dynamodb_table" { 
+module  "dynamodb_registration_table" { 
    source = "./terraform/modules/dynamodb_table" 
 }
 

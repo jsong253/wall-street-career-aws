@@ -12,12 +12,12 @@ resource "aws_lambda_function" "create_lambda_function" {
 
   environment{
     variables={
-        ENV="dev"
-        REGION="us-east-1"
-        REGISTRATION_TABLE = ""
-        REGISTRATION_TABLE_ARN = ""
-        CORS_ALLOWED_ORIGION=""
-        RECORD_EXPIRATION_IN_DAYS="185"
+        ENV=var.env
+        REGION                    =var.region
+        REGISTRATION_TABLE        = var.registration_table_name
+        REGISTRATION_TABLE_ARN    =  var.registration_table_arn
+        CORS_ALLOWED_ORIGION      ="*"
+        RECORD_EXPIRATION_IN_DAYS =var.record_expiration_in_days
     }
   }
 }

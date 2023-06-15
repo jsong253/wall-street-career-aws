@@ -15,3 +15,28 @@ variable "retention_in_days" {
   default     = 30
 }
 
+variable "registration_table_name" {
+  type        = string
+  description = "The name of the dynamodb registrtion table"
+}
+
+variable "registration_table_arn" {
+  type        = string
+  description = "The arn of the dynamodb registrtion table"
+}
+
+variable "record_expiration_in_days" {
+  type        = number
+  description = "The items or records of the dynamodb registrtion table to be removed from the table after a certain days"
+  default = 365
+}
+
+variable "env"{
+  type        = string
+  description = "The env for the lambda to run"
+}
+
+variable "region"{
+  type        = string
+  description = "The env for the lambda to run"
+}
