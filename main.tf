@@ -11,7 +11,7 @@ provider "aws" {
   # Configuration options
   region                  = var.region
   // profile                 = var.aws_profile
-  // shared_credentials_files = [var.shared_credentials_file]
+  // shared_credentials_files = [var.shared_credentials_file]       // ["$HOME/.aws/credentials"]
   default_tags {
     tags = var.tags
   }
@@ -48,8 +48,13 @@ module "authorize_lambda_function" {
   common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
 }
 
-
 module "lambda_layer" {
   source =  "./terraform/modules/lambda_layer"   
 }
+
+module  "registration_dynamodb_table" { 
+   source = "./terraform/modules/dynamodb_table" 
+}
+
+
 
