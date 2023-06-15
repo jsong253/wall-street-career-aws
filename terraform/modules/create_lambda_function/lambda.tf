@@ -42,10 +42,29 @@ resource "aws_iam_role" "create_lambda_execution_role" {
     ]
   })
 }
+
+// allow apigateway to execute the lambda
 resource "aws_iam_role_policy_attachment" "create_lambda_policy" {
   role       = aws_iam_role.create_lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+// allow lamnda to access dynamodb table
+resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
+   name = "allow_lambda_to_access_dynamodb_policy"
+   role = aws_iam_role.create_lambda_execution_role.id
+   policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+           "Effect" : "Allow",
+           "Action" : ["dynamodb:*"],
+           "Resource" : "${var.registration_table_arn}"
+        }
+      ]
+   })
+}
+
 
 // alternate way to archive lambda without using s3 bucket to store lambda zip file
 // used without s3

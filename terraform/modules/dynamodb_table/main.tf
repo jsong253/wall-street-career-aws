@@ -60,7 +60,7 @@ resource "aws_dynamodb_table" "registration_table" {
 
   attribute {
     name = "startTime"
-    type = "S"
+    type = "N"
   }
 
    attribute {
@@ -96,6 +96,8 @@ resource "aws_dynamodb_table" "registration_table" {
     write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
   }
 
+  // The TTL attribute’s value must be a timestamp in Unix epoch time format in seconds. If you use any other format, the TTL processes ignore the item. For example, if you set the value of the attribute to 1645119622, that is Thursday, February 17, 2022 17:40:22 (GMT), the item will be expired after that time.
+  // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-before-you-start.html
   ttl {
     attribute_name = "expiryPeriod"
     enabled = true
