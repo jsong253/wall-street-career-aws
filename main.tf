@@ -41,6 +41,7 @@ module "get_lambda_function" {
   registration_table_arn = module.dynamodb_registration_table.registration_table_arn
   region = var.region
   env = var.env
+  common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
 }
 
 module "create_lambda_function" {
@@ -49,6 +50,7 @@ module "create_lambda_function" {
   registration_table_arn = module.dynamodb_registration_table.registration_table_arn
   region = var.region
   env = var.env
+  common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
 }
 
 module "authorize_lambda_function" {

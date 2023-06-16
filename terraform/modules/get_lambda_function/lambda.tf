@@ -55,6 +55,8 @@ resource "aws_lambda_function" "get_lambda_function" {
   source_code_hash = data.archive_file.get_registrations_get_lambda_archive_file.output_base64sha256        
   role             = aws_iam_role.get_lambda_execution_role.arn
 
+  layers = [var.common_lambda_layer_arn]
+  
   environment{
     variables={
         ENV=var.env

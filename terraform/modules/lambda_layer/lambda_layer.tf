@@ -7,6 +7,8 @@ resource "aws_lambda_layer_version" "my_custom_layer" {
   compatible_runtimes = ["nodejs14.x", "nodejs12.x"]
 }
 
+
+// first manually create ./terraform/common-lambda-layer/common-lambda-layer.zip locally in your pc
 data "archive_file" "layer" {
   type        = "zip"
   source_dir  = "./terraform/common-lambda-layer"

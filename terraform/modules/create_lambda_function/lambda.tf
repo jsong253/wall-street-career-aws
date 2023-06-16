@@ -10,6 +10,8 @@ resource "aws_lambda_function" "create_lambda_function" {
   // memory_size       = var.lambda_memory_size
   // timeout           = var.lambda_timeout
 
+  layers = [var.common_lambda_layer_arn]
+
   environment{
     variables={
         ENV=var.env

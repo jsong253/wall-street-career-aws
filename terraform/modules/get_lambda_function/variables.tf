@@ -40,3 +40,8 @@ variable "region"{
   type        = string
   description = "The env for the lambda to run"
 }
+
+variable "common_lambda_layer_arn"{
+  type = string
+  description = "the arn of the lambda layer for comon-lambda-layer"
+}

@@ -52,3 +52,8 @@ variable "record_expiration_in_days" {
   description = "The items or records of the dynamodb registrtion table to be removed from the table after a certain days"
   default = 365
 }
+
+variable "common_lambda_layer_arn"{
+  type = string
+  description = "the arn of the lambda layer for comon-lambda-layer"
+}
