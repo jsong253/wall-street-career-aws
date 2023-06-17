@@ -38,11 +38,11 @@ resource "aws_api_gateway_method" "rest_api_get_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_get_resource.id
   http_method = "GET"
-  authorization = "NONE"                // no authorizer
-  //authorization = "CUSTOM"            // "CUSTOM"
+  // authorization = "NONE"                // no authorizer
+  authorization = "CUSTOM"            // "CUSTOM"
   
   request_validator_id = aws_api_gateway_request_validator.rest_api_get_method_validator.id
-  // authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id     // to enable the authorizer, uncomment this line and change to authorization = "CUSTOM"  
+  authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id     // to enable the authorizer, uncomment this line and change to authorization = "CUSTOM"  
 
   request_parameters   = {
     "method.request.querystring.email"          = false,
@@ -235,11 +235,11 @@ resource "aws_api_gateway_method" "rest_api_create_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_create_resource.id
   http_method = "POST"
-  authorization = "NONE"                // no authorizer
-  // authorization = "CUSTOM"            // "CUSTOM"
+  // authorization = "NONE"                // no authorizer
+  authorization = "CUSTOM"            // "CUSTOM"
   
   request_validator_id = aws_api_gateway_request_validator.rest_api_create_method_validator.id
-  // authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id        // to enable the authorizer, uncomment this line and change Authorization = "CUSTOM"
+  authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id        // to enable the authorizer, uncomment this line and change Authorization = "CUSTOM"
 
   # request_models = {
   #   "application/json" = aws_api_gateway_model.rest_api_create_method__model.name

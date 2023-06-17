@@ -67,6 +67,21 @@ resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
    })
 }
 
+// allow lamnda to access dynamodb table
+resource "aws_iam_role_policy" "kms-lambda-policy" {
+   name = "allow_lambda_to_access_dynamodb_kms_policy"
+   role = aws_iam_role.create_lambda_execution_role.id
+   policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+           "Effect" : "Allow",
+           "Action" : ["kms:*"],
+           "Resource" : "${var.dynamodb_kms-key-arn}"             //  "Resource": "your-KMS-key-arn"
+        }
+      ]
+   })
+}
 
 // alternate way to archive lambda without using s3 bucket to store lambda zip file
 // used without s3
@@ -77,4 +92,12 @@ data "archive_file" "get_registrations_create_lambda_archive_file" {
     content   = "${file("terraform/modules/create_lambda_function/index.js")}"         // must be the full path
     filename  = "modules/create_lambda_function/index.js"
   }
+
+   source {
+    content   = "${file("terraform/common/ddb.js")}"         // must be the full path
+    filename  = "modules/create_lambda_function/ddb.js"
+  }
 }
+
+
+

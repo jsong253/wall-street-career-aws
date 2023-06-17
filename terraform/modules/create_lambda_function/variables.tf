@@ -57,3 +57,8 @@ variable "common_lambda_layer_arn"{
   type = string
   description = "the arn of the lambda layer for comon-lambda-layer"
 }
+
+variable "dynamodb_kms-key-arn" {
+  type = string
+  description = "the arn of the dynamodb kms key"
+}

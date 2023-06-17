@@ -51,6 +51,7 @@ module "create_lambda_function" {
   region = var.region
   env = var.env
   common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
+  dynamodb_kms-key-arn    = module.dynamodb_registration_table.dynamo_kms_key_arn
 }
 
 module "authorize_lambda_function" {

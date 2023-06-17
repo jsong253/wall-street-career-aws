@@ -103,24 +103,24 @@ resource "aws_iam_role" "invocation_role" {
 EOF
 }
 
-// do not format the policy code block otherwise you get tarraform apply error invalid policy
-resource "aws_iam_role_policy" "invocation_policy" {
-  name = "default"
-  role = aws_iam_role.invocation_role.id
+# // do not format the policy code block otherwise you get tarraform apply error invalid policy
+# resource "aws_iam_role_policy" "invocation_policy" {
+#   name = "default"
+#   role = aws_iam_role.invocation_role.id
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "lambda:InvokeFunction",
-      "Effect": "Allow",
-      "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
-    }
-  ]
-}
-EOF
-}
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "lambda:InvokeFunction",
+#       "Effect": "Allow",
+#       "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 resource "aws_iam_role_policy_attachment" "get_lambda_policy" {
   role       = aws_iam_role.lambda.name

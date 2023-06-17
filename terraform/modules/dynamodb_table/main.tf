@@ -25,7 +25,7 @@ resource "aws_dynamodb_table" "registration_table" {
 
   attribute {
     name = "ID"
-    type = "S"
+    type = "N"
   }
 
   # attribute {
@@ -118,6 +118,11 @@ resource "aws_dynamodb_table" "registration_table" {
   server_side_encryption {
     enabled = "true"
     kms_key_arn = aws_kms_key.dynamo_kms_key.arn
+  }
+
+   tags = {
+    Name        = "registration-table-prod"
+    Environment = "production"
   }
 }
 
