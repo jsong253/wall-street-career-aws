@@ -15,18 +15,6 @@ variable "retention_in_days" {
   default     = 30
 }
 
-variable "lambda_memory_size"{
-  type        = number
-  description = "The max memory size for the lambda"
-  default     = 30000
-}
-
-variable "lambda_timeout"{
-  type        = number
-  description = "The timeout for the lambda to run"
-  default     = 3600
-}
-
 variable "env"{
   type        = string
   description = "The env for the lambda to run"
@@ -61,4 +49,24 @@ variable "common_lambda_layer_arn"{
 variable "dynamodb_kms-key-arn" {
   type = string
   description = "the arn of the dynamodb kms key"
+}
+
+variable "lambda_memory_size" {
+  type = number
+  description = "the memory size for the lambda"
+}
+
+variable "lambda_timeout" {
+  type = number
+  description = "the timeout for the lambda"
+} 
+
+variable "cors_allowed_origin" {
+  type = string
+  description = "allowed origion to call lambda function"
+}
+
+variable "lambda_runtime"{
+  type= string
+  description = "version of the lambda"
 }

@@ -50,10 +50,13 @@ resource "aws_lambda_function" "get_lambda_function" {
   filename = data.archive_file.get_registrations_get_lambda_archive_file.output_path
   function_name    = var.get_lambda_function_name
   description      = var.get_lambda_function_name
-  runtime          = "nodejs14.x"
+  runtime          = var.lambda_runtime
   handler          = "modules/get_lambda_function/index.handler"
   source_code_hash = data.archive_file.get_registrations_get_lambda_archive_file.output_base64sha256        
-  role             = aws_iam_role.get_lambda_execution_role.arn
+  role             = aws_iam_role.get_lambda_assumed_role.arn
+  memory_size      = var.lambda_memory_size
+  timeout          = var.lambda_timeout
+  architectures    = ["arm64"]
 
   layers = [var.common_lambda_layer_arn]
   
@@ -73,42 +76,39 @@ resource "aws_cloudwatch_log_group" "get_lambda_log_group" {
   retention_in_days = var.retention_in_days
 }
 
-resource "aws_iam_role" "get_lambda_execution_role" {
-  name = "lambda_execution_role_${var.get_lambda_function_name}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Sid    = ""
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      }
-    ]
-  })
+// lambda assumed role
+resource "aws_iam_role" "get_lambda_assumed_role" {
+  name               = "lambda_assumed_role_${var.get_lambda_function_name}"
+  description        = "Assumed Role for Lambda"
+  assume_role_policy = data.aws_iam_policy_document.lambdatrustpolicy.json
 }
-resource "aws_iam_role_policy_attachment" "get_lambda_policy" {
-  role       = aws_iam_role.get_lambda_execution_role.name
+
+
+// role policy for creation of logs
+resource "aws_iam_role_policy_attachment" "get_registration_lambda_logs_attachment" {
+  role       = aws_iam_role.get_lambda_assumed_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# // role policy attacchment to assume lambda_execution_role
+# resource "aws_iam_role_policy_attachment" "AWSLambdaVPCAccessExecutionRoleForGetUploadDiagnostics" {
+#     role       = aws_iam_role.get_lambda_assumed_role.name
+#     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+# }
 
-// allow lamnda to access dynamodb table
-resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
-   name = "allow_lambda_to_access_dynamodb_policy"
-   role = aws_iam_role.get_lambda_execution_role.id
-   policy = jsonencode({
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-           "Effect" : "Allow",
-           "Action" : ["dynamodb:*"],
-           "Resource" :  "${var.registration_table_arn}"                                       // var.registration_table_arn
-        }
-      ]
-   })
+
+// iam policy
+resource "aws_iam_policy" "get_registration_lambda_policy" {
+  name        = "get_registration_lambda_policy_to_access_dynamodb"
+  description = "allows lambda to get data from the dynamoDB"
+  policy      = data.aws_iam_policy_document.get_registration_lambda_policydoc.json
 }
+
+resource "aws_iam_role_policy_attachment" "get_registration_lambda_policy_attachment" {
+  role       = aws_iam_role.get_lambda_assumed_role.name
+  policy_arn = aws_iam_policy.get_registration_lambda_policy.arn
+}
+
 
 // alternate way to archive lambda without using s3 bucket to store lambda zip file
 // used without s3
@@ -120,3 +120,46 @@ data "archive_file" "get_registrations_get_lambda_archive_file" {
     filename  = "modules/get_lambda_function/index.js"
   }
 }
+
+data "aws_iam_policy_document" "get_registration_lambda_policydoc" {
+  statement {
+    effect    = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:GetItem",
+      "dynamodb:GetRecords",
+      "dynamodb:GetShardIterator",
+      "dynamodb:DescribeStream",
+      "dynamodb:ListShards",
+      "dynamodb:ListStreams"
+    ]
+    resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "lambdatrustpolicy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    sid = ""
+  }
+}
+

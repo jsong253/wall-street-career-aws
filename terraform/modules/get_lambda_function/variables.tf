@@ -45,3 +45,23 @@ variable "common_lambda_layer_arn"{
   type = string
   description = "the arn of the lambda layer for comon-lambda-layer"
 }
+
+variable "lambda_memory_size" {
+  type = number
+  description = "the memory size for the lambda"
+}
+
+variable "lambda_timeout" {
+  type = number
+  description = "the timeout for the lambda"
+}
+
+variable "cors_allowed_origin" {
+  type = string
+  description = "allowed origion to call lambda function"
+}
+
+variable "lambda_runtime"{
+  type= string
+  description = "version of the lambda"
+}

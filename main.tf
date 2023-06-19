@@ -42,6 +42,10 @@ module "get_lambda_function" {
   region = var.region
   env = var.env
   common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
+  lambda_memory_size      = var.lambda_memory_size
+  lambda_timeout          = var.lambda_timeout
+  lambda_runtime          = var.lambda_runtime
+  cors_allowed_origin     = var.cors_allowed_origin
 }
 
 module "create_lambda_function" {
@@ -52,10 +56,14 @@ module "create_lambda_function" {
   env = var.env
   common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
   dynamodb_kms-key-arn    = module.dynamodb_registration_table.dynamo_kms_key_arn
+  lambda_memory_size      = var.lambda_memory_size
+  lambda_timeout          = var.lambda_timeout
+  lambda_runtime          = var.lambda_runtime
+  cors_allowed_origin     = var.cors_allowed_origin
 }
 
 module "authorize_lambda_function" {
-  source = "./terraform/modules/authorize_lambda_function"
+  source                  = "./terraform/modules/authorize_lambda_function"
   common_lambda_layer_arn = module.lambda_layer.lambda_layer_arn
 }
 
@@ -64,7 +72,10 @@ module "lambda_layer" {
 }
 
 module  "dynamodb_registration_table" { 
-   source = "./terraform/modules/dynamodb_table" 
+   source                   = "./terraform/modules/dynamodb_table" 
+   env                      = var.env
+   registration_table_name  = var.registration_table_name
+   billing_mode             = var.billing_mode
 }
 
 

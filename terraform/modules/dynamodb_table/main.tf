@@ -1,6 +1,7 @@
 // https://dynobase.dev/dynamodb-terraform/
 // https://medium.com/@jun711.g/how-to-set-time-to-live-attribute-for-amazon-dynamodb-entries-6b10ed16281#:~:text=Open%20up%20your%20AWS%20console,TTL%20button%20next%20to%20it.
 
+// https://repost.aws/knowledge-center/lambda-kmsaccessdeniedexception-errors
 
 resource "aws_kms_key" "dynamo_kms_key" {
   description = "Encryption key for dynamo"
@@ -14,7 +15,7 @@ resource "aws_kms_alias" "dynamo_kms_alias" {
 }
 
 resource "aws_dynamodb_table" "registration_table" {
-  name = "${var.table_name}-${var.env}"
+  name = "${var.registration_table_name}-${var.env}"
   billing_mode = var.billing_mode               // PROVISIONED or "PAY_PER_REQUEST"
   hash_key = "ID"
   read_capacity           = 5
@@ -25,13 +26,13 @@ resource "aws_dynamodb_table" "registration_table" {
 
   attribute {
     name = "ID"
-    type = "N"
+    type = "S"
   }
 
-  # attribute {
-  #   name = "email"
-  #   type = "S"
-  # }
+  attribute {
+    name = "email"
+    type = "S"
+  }
 
   # attribute {
   #   name = "phone"
@@ -53,10 +54,10 @@ resource "aws_dynamodb_table" "registration_table" {
   #   type = "N"
   # }
 
-  # attribute {
-  #   name = "password"
-  #   type = "S"
-  # }
+  attribute {
+    name = "password"
+    type = "S"
+  }
 
   attribute {
     name = "startTime"
@@ -78,6 +79,7 @@ resource "aws_dynamodb_table" "registration_table" {
     type = "S"
   }
 
+  // name index with attribute name plus sufix 'Index'
   global_secondary_index {
     name = "CreatedAtIndex"
     hash_key = "createdAt"
@@ -88,9 +90,18 @@ resource "aws_dynamodb_table" "registration_table" {
   }
 
   global_secondary_index {
-    name = "RegistrationType"
+    name = "RegistrationTypeIndex"
     hash_key = "registrationType"
     range_key = "startTime"
+    projection_type = "ALL"
+    read_capacity           = 5
+    write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
+  }
+
+  global_secondary_index {
+    name = "emailIndex"
+    hash_key = "email"
+    range_key = "password"
     projection_type = "ALL"
     read_capacity           = 5
     write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
@@ -117,15 +128,22 @@ resource "aws_dynamodb_table" "registration_table" {
 
   server_side_encryption {
     enabled = "true"
+    // false -> use AWS Owned CMK 
+    // true -> use AWS Managed CMK 
+    // true + key arn -> use custom key
     kms_key_arn = aws_kms_key.dynamo_kms_key.arn
   }
 
    tags = {
-    Name        = "registration-table-prod"
+    Name        = "${var.registration_table_name}-${var.env}"
     Environment = "production"
   }
 }
 
+// For tables on the PROVISIONED billing mode, you can configure auto-scaling so that DynamoDB scales up to 
+// adjust the provisioned capacity based on traffic patterns.
+
+// https://registry.terraform.io/modules/snowplow-devops/dynamodb-autoscaling/aws/latest
 module  "table_autoscaling" { 
    source = "snowplow-devops/dynamodb-autoscaling/aws" 
    table_name = aws_dynamodb_table.registration_table.name

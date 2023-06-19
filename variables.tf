@@ -12,7 +12,7 @@ variable "account_id"{
 variable "env" {
     type = string
     description = "The region in which to create/manage resources"
-    default = "test"
+    default = "Prod"
 }
 variable "shared_credentials_file" {
   description = "Profile file with credentials to the AWS account"
@@ -25,7 +25,42 @@ variable "tags" {
   type        = map(string)
   default ={
     application = "wall-street-carrer"
-    env         = "Test"
+    env         = "Prod"
   }
 }
 
+variable "lambda_memory_size" {
+  type = string
+  description = "the memory size for the lambda"
+  default = "128"
+}
+
+variable "lambda_timeout" {
+  type = number
+  description = "the timeout for the lambda"
+  default = 10
+}
+
+variable "cors_allowed_origin" {
+  type        = string
+  description = "allowed origion to call lambda function"
+  default     = "*"
+}
+
+variable "registration_table_name" {
+  type          = string
+  description   = "The name of the dynamodb registration table"
+  default       = "registration_table"
+}
+
+variable "billing_mode" {
+  type          = string
+  description   = "The aws billing method"
+  default       = "PROVISIONED"
+}
+
+variable "lambda_runtime"{
+  type= string
+  description = "version of the lambda"
+  default= "nodejs14.x"
+}

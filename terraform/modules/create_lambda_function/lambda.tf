@@ -1,14 +1,16 @@
 // archive lambda code without s3
+// https://repost.aws/knowledge-center/lambda-kmsaccessdeniedexception-errors
 resource "aws_lambda_function" "create_lambda_function" {
   filename          = data.archive_file.get_registrations_create_lambda_archive_file.output_path
   function_name     = var.create_lambda_function_name
   description       = var.create_lambda_function_name
-  runtime           = "nodejs14.x"
+  runtime           = var.lambda_runtime
   handler           = "modules/create_lambda_function/index.handler"
   source_code_hash  = data.archive_file.get_registrations_create_lambda_archive_file.output_base64sha256        
   role              = aws_iam_role.create_lambda_execution_role.arn
-  // memory_size       = var.lambda_memory_size
-  // timeout           = var.lambda_timeout
+  memory_size      = var.lambda_memory_size
+  timeout          = var.lambda_timeout
+  architectures    = ["arm64"]
 
   layers = [var.common_lambda_layer_arn]
 
@@ -51,7 +53,7 @@ resource "aws_iam_role_policy_attachment" "create_lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-// allow lamnda to access dynamodb table
+// allow lambda to access dynamodb table
 resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
    name = "allow_lambda_to_access_dynamodb_policy"
    role = aws_iam_role.create_lambda_execution_role.id
@@ -67,7 +69,7 @@ resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
    })
 }
 
-// allow lamnda to access dynamodb table
+// allow lamnda to access dynamodb table kms key to deencript table data
 resource "aws_iam_role_policy" "kms-lambda-policy" {
    name = "allow_lambda_to_access_dynamodb_kms_policy"
    role = aws_iam_role.create_lambda_execution_role.id
