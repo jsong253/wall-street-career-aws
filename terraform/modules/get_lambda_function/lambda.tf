@@ -90,13 +90,6 @@ resource "aws_iam_role_policy_attachment" "get_registration_lambda_logs_attachme
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# // role policy attacchment to assume lambda_execution_role
-# resource "aws_iam_role_policy_attachment" "AWSLambdaVPCAccessExecutionRoleForGetUploadDiagnostics" {
-#     role       = aws_iam_role.get_lambda_assumed_role.name
-#     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-# }
-
-
 // iam policy
 resource "aws_iam_policy" "get_registration_lambda_policy" {
   name        = "get_registration_lambda_policy_to_access_dynamodb"

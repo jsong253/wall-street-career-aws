@@ -1,0 +1,34 @@
+// https://dynobase.dev/dynamodb-terraform/
+// source code:
+// https://github.com/lakindu2002/terraform-dynamodb/tree/main/lambdas
+
+// create a s3 bucket for storing state locking
+resource "aws_s3_bucket" "bucket" {
+ bucket = "wall-street-career-state-locking-s3-bucket-jlyaa"
+ object_lock_configuration {
+   object_lock_enabled = "Enabled"
+ }
+}
+
+
+// create a dynamodb table for state locking
+// The table requires a mandatory hash key named "LockID" with type String for state locking to work.
+resource "aws_dynamodb_table" "terraform_state_lock" {
+ name = "terraform_state"
+ read_capacity = 5
+ write_capacity = 5
+ hash_key = "LockID"
+ attribute {
+   name = "LockID"
+   type = "S"
+ }
+}
+
+terraform {
+ backend "s3" {
+   bucket = "wall-street-career-state-locking-s3-bucket-jlyaa"
+   key = "terraform.tfstate"
+   region = "us-east-1"
+   dynamodb_table = "terraform_state"
+ }
+}
