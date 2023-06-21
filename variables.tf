@@ -64,3 +64,9 @@ variable "lambda_runtime"{
   description = "version of the lambda"
   default= "nodejs14.x"
 }
+
+variable "feedback_table_name" {
+  type          = string
+  description   = "The name of the dynamodb feedback table"
+  default       = "feedback_table"
+}

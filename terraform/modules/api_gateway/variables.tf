@@ -89,3 +89,29 @@ variable "retention_in_days" {
   description = "The retention days for the lambda log"
   default     = 30
 }
+
+//value comes from main.tf
+variable "feedback_get_lambda_function_name" {
+  type        = string
+  description = "The name of the Lambda function"
+}
+
+
+//value comes from main.tf
+variable "feedback_get_lambda_function_arn" {
+  type        = string
+  description = "The ARN of the Lambda function"
+} 
+
+//value comes from main.tf
+variable "feedback_create_lambda_function_name" {
+  type        = string
+  description = "The name of the Lambda function"
+}
+
+
+//value comes from main.tf
+variable "feedback_create_lambda_function_arn" {
+  type        = string
+  description = "The ARN of the Lambda function"
+} 
