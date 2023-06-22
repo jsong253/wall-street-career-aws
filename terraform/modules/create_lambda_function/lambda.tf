@@ -4,12 +4,12 @@ resource "aws_lambda_function" "create_lambda_function" {
   filename          = data.archive_file.get_registrations_create_lambda_archive_file.output_path
   function_name     = var.create_lambda_function_name
   description       = var.create_lambda_function_name
-  runtime           = var.lambda_runtime
   handler           = "modules/create_lambda_function/index.handler"
   source_code_hash  = data.archive_file.get_registrations_create_lambda_archive_file.output_base64sha256        
   role              = aws_iam_role.create_lambda_execution_role.arn
   memory_size      = var.lambda_memory_size
   timeout          = var.lambda_timeout
+  runtime           = var.lambda_runtime
   architectures    = ["arm64"]
 
   layers = [var.common_lambda_layer_arn]

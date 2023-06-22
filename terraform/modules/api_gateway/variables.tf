@@ -28,6 +28,11 @@ variable "authorize_lambda_function_name" {
   description = "The name of the Lambda function"
 }
 
+//value comes from main.tf
+variable "request_authorize_lambda_function_name" {
+  type        = string
+  description = "The name of the request authorize lambda function"
+}
 
 //value comes from main.tf
 variable "get_lambda_function_arn" {
@@ -115,3 +120,14 @@ variable "feedback_create_lambda_function_arn" {
   type        = string
   description = "The ARN of the Lambda function"
 } 
+
+//value comes from main.tf
+variable "request_authorize_lambda_function_invoke_arn" {
+  type        = string
+  description = "The ARN of the Lambda function"
+}  
+
+//value comes from main.tf
+variable "request_authorize_lambda_invocation_role_arn" {
+  type        = string
+}

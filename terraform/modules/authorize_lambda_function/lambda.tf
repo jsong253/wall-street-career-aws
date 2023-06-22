@@ -11,7 +11,10 @@ resource "aws_lambda_function" "authorize_lambda_function" {
   filename          = data.archive_file.get_registrations_authorize_lambda_archive_file.output_path
   function_name     = var.authorize_lambda_function_name
   description       = var.authorize_lambda_function_name
-  runtime           = "nodejs14.x"
+  memory_size       = var.lambda_memory_size
+  timeout           = var.lambda_timeout
+  runtime           = var.lambda_runtime
+  architectures     = ["arm64"]
   handler           = "modules/authorize_lambda_function/index.handler"
   source_code_hash  = data.archive_file.get_registrations_authorize_lambda_archive_file.output_base64sha256        
   role              = aws_iam_role.lambda.arn
@@ -21,12 +24,12 @@ resource "aws_lambda_function" "authorize_lambda_function" {
   
   environment{
     variables={
-        ENV="dev"
-        REGION="us-east-1"
-        REGISTRATION_TABLE = ""
-        REGISTRATION_TABLE_ARN = ""
-        CORS_ALLOWED_ORIGION=""
-        RECORD_EXPIRATION_IN_DAYS="185"
+        ENV                         = var.env
+        REGION                      = var.region
+        REGISTRATION_TABLE          = var.registration_table_name
+        REGISTRATION_TABLE_ARN      = var.registration_table_arn
+        CORS_ALLOWED_ORIGION        = ""
+        RECORD_EXPIRATION_IN_DAYS   = var.retention_in_days
     }
   }
 }
@@ -103,24 +106,24 @@ resource "aws_iam_role" "invocation_role" {
 EOF
 }
 
-# // do not format the policy code block otherwise you get tarraform apply error invalid policy
-# resource "aws_iam_role_policy" "invocation_policy" {
-#   name = "default"
-#   role = aws_iam_role.invocation_role.id
+// do not format the policy code block otherwise you get tarraform apply error invalid policy
+resource "aws_iam_role_policy" "invocation_policy" {
+  name = "aws_iam_role_policy_registration"
+  role = aws_iam_role.invocation_role.id
 
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": "lambda:InvokeFunction",
-#       "Effect": "Allow",
-#       "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
-#     }
-#   ]
-# }
-# EOF
-# }
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "lambda:InvokeFunction",
+      "Effect": "Allow",
+      "Resource": "${aws_lambda_function.authorize_lambda_function.arn}"
+    }
+  ]
+}
+EOF
+}
 
 resource "aws_iam_role_policy_attachment" "get_lambda_policy" {
   role       = aws_iam_role.lambda.name

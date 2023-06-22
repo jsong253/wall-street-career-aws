@@ -4,7 +4,7 @@ resource "aws_lambda_function" "feedback_create_lambda_function" {
   function_name     = var.feedback_create_lambda_function_name
   description       = var.feedback_create_lambda_function_name
   runtime           = var.lambda_runtime
-  handler           = "modules/create_lambda_function/index.handler"
+  handler           = "modules/feedback_create_lambda_function/index.handler"
   source_code_hash  = data.archive_file.create_feedback_create_lambda_archive_file.output_base64sha256        
   role              = aws_iam_role.feedback_create_lambda_execution_role.arn
   memory_size      = var.lambda_memory_size

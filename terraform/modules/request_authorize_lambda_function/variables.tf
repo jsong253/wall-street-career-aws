@@ -1,8 +1,8 @@
 
-variable "authorize_lambda_function_name" {
+variable "request_authorize_lambda_function_name" {
   type        = string
   description = "The name of the Lambda function for create-registrations endpoint"
-  default     = "Authorize-Registrations-Lambda"
+  default     = "Request-Authorize-Feedback-Lambda"
 }
 
 variable "retention_in_days" {
@@ -17,12 +17,12 @@ variable "common_lambda_layer_arn"{
   description = "the arn of the lambda layer for comon-lambda-layer"
 }
 
-variable "registration_table_name" {
+variable "feedback_table_name" {
   type        = string
   description = "The name of the dynamodb registrtion table"
 }
 
-variable "registration_table_arn" {
+variable "feedback_table_arn" {
   type        = string
   description = "The arn of the dynamodb registrtion table"
 }
@@ -51,3 +51,4 @@ variable "region"{
   type        = string
   description = "The env for the lambda to run"
 }
+

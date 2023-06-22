@@ -5,7 +5,7 @@
 // https://dynobase.dev/dynamodb-terraform/
 
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html
-const REGISTRATION_TABLE = 'registration_table-Prod';
+const FEEDBACK_TABLE = 'feedback_table-Prod';
 const AWS = require("aws-sdk"); 
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
@@ -17,17 +17,18 @@ const uuid = ()=>
 )
 
 exports.handler = async (event) => {
-  console.log(`index.js create-registrations start`)
+  console.log(`index.js create-feedback start`)
 
   const errors = []
   const records = []
- 
+  console.log(`event: ${JSON.stringify(event, null, 4)}`)
 
   const body = JSON.parse(event.body)
 
+  console.log(` body: ${JSON.stringify(body, null, 4)}`)
+
   const newItem = {
     ...body,
-    startTime: new Date().getTime(),
     createdAt: new Date().getTime(),
     // createdAt: `${new Date(new Date().toISOString()).getTime()}`,
     ID: uuid(),
@@ -39,17 +40,17 @@ exports.handler = async (event) => {
   try{
     await documentClient
     .put({
-      TableName: REGISTRATION_TABLE,
+      TableName: FEEDBACK_TABLE,
       Item: newItem,
      })
     .promise();
     records.push(newItem)
     
   } catch (e){
-    console.log(`Error when saving registration data into dynamodb table: ${JSON.stringify(e, null, 4)}`)
+    console.log(`Error when saving feedback data into dynamodb table: ${JSON.stringify(e, null, 4)}`)
     errors.push(e)
   } finally{
-    console.log(`index.js create-registrations end`)
+    console.log(`index.js create-feedback end`)
   }
 
   if (errors.length > 0) {
