@@ -13,6 +13,10 @@
 
 // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/dynamodb-example-table-read-write.html
 
+// you have to use POST in th epostman call even for your get feedback lambda call.  see article below.
+// https://stackoverflow.com/questions/41371970/accessdeniedexception-unable-to-determine-service-operation-name-to-be-authoriz
+
+
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 
@@ -89,7 +93,7 @@ exports.handler = async (event) => {
 
       return failureResponse
    } finally{
-      console.log(`index.js get-registrations end`)
+      console.log(`index.js get-feedback end`)
    }
 
    const successResponse = {
