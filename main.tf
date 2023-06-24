@@ -39,6 +39,8 @@ module "api_gateway" {
   request_authorize_lambda_function_invoke_arn = module.request_authorize_lambda_function.request_authorize_lambda_function_invoke_arn
   request_authorize_lambda_invocation_role_arn = module.request_authorize_lambda_function.request_authorize_lambda_invocation_role_arn
   
+  cors_allowed_origin = var.cors_allowed_origin
+
   depends_on = [
     module.get_lambda_function,
     module.create_lambda_function,

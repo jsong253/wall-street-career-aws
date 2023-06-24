@@ -48,7 +48,8 @@ exports.handler = async (event) => {
 
    console.log(`event.queryStringParameters: ${JSON.stringify(event.queryStringParameters, null, 4)}`)
 
-   const {email, phone} = event.queryStringParameters          // destructuring to get passed in query info
+   // const {email, phone} = event.queryStringParameters          // destructuring to get passed in query info
+   const { email, phone, status, start, end } = event.queryStringParameters
    console.log(`email: ${email}`)
    console.log(`phone: ${phone}`)
 

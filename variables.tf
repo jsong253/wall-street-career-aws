@@ -41,12 +41,6 @@ variable "lambda_timeout" {
   default = 10
 }
 
-variable "cors_allowed_origin" {
-  type        = string
-  description = "allowed origion to call lambda function"
-  default     = "*"
-}
-
 variable "registration_table_name" {
   type          = string
   description   = "The name of the dynamodb registration table"
@@ -69,4 +63,10 @@ variable "feedback_table_name" {
   type          = string
   description   = "The name of the dynamodb feedback table"
   default       = "feedback_table"
+}
+
+variable "cors_allowed_origin" {
+  type        = string
+  description = "The allowed origin to connect to back end"
+  default     = "http://localhost:3000"
 }
