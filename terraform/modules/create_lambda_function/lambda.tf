@@ -95,7 +95,7 @@ data "archive_file" "get_registrations_create_lambda_archive_file" {
     filename  = "modules/create_lambda_function/index.js"
   }
 
-   source {
+  source {
     content   = "${file("terraform/common/ddb.js")}"         // must be the full path
     filename  = "modules/create_lambda_function/ddb.js"
   }

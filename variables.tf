@@ -67,6 +67,6 @@ variable "feedback_table_name" {
 
 variable "cors_allowed_origin" {
   type        = string
-  description = "The allowed origin to connect to back end"
+  description = "allow a given web application running at one origin (domain) to access selected resources from a server at a different origin"
   default     = "http://localhost:3000"
 }

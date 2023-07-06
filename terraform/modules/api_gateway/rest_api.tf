@@ -13,6 +13,16 @@ resource "aws_api_gateway_resource" "rest_api_get_resource" {
   path_part = "get-registrations"
 }
 
+resource "aws_api_gateway_model" "registration_create_model" {
+  rest_api_id  = aws_api_gateway_rest_api.rest_api.id
+  name         = "registrationmodelvalidation${var.env}"
+  description  = "use registration_model_validation to get correct user inputs"
+  content_type = "application/json"
+
+  schema = file("${path.root}/terraform/common/registration_create_schema.json")       // path.root is "."
+  // schema       = file("common/schema/publishStatus.json")
+}
+
 resource "aws_api_gateway_request_validator" "rest_api_get_method_validator" {
   name                        = "get_registrations-method-validator"
   rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
@@ -264,9 +274,9 @@ resource "aws_api_gateway_method" "rest_api_create_method"{
   request_validator_id = aws_api_gateway_request_validator.rest_api_create_method_validator.id
   authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id        // to enable the authorizer, uncomment this line and change Authorization = "CUSTOM"
 
-  # request_models = {
-  #   "application/json" = aws_api_gateway_model.rest_api_create_method__model.name
-  # }
+  request_models = {
+    "application/json" = aws_api_gateway_model.registration_create_model.name
+  }
 
   api_key_required     = false
 }
@@ -396,6 +406,15 @@ resource "aws_api_gateway_resource" "rest_api_feedback_resource" {
   path_part = "feedbacks"
 }
 
+resource "aws_api_gateway_model" "feedback_create_model" {
+  rest_api_id  = aws_api_gateway_rest_api.rest_api.id
+  name         = "feedbackmodelvalidation${var.env}"
+  description  = "use feedback_model_validation to get correct user inputs"
+  content_type = "application/json"
+
+  schema = file("${path.root}/terraform/common/feedback_create_schema.json")
+}
+
 resource "aws_api_gateway_request_validator" "rest_api_feedback_get_method_validator" {
   name                        = "feedbacks-get-method-validator"
   rest_api_id                 = aws_api_gateway_rest_api.rest_api.id
@@ -484,9 +503,9 @@ resource "aws_lambda_permission" "api_gateway_feedback_get_lambda" {
   depends_on    = [aws_api_gateway_rest_api.rest_api, aws_api_gateway_method.rest_api_feedback_get_method, aws_api_gateway_resource.rest_api_feedback_resource]
 }
 
-
-// ////////////////////////////////////POST//////////////////////////////
-// ///////////////////////////////////////create-feedback endpoint
+/////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////POST///////////////////////////////////////////////////
+//////////////////////////////////////////create-feedback endpoint/////////////////////////////
 resource "aws_api_gateway_method" "rest_api_feedback_create_method"{
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   resource_id = aws_api_gateway_resource.rest_api_feedback_resource.id
@@ -498,6 +517,10 @@ resource "aws_api_gateway_method" "rest_api_feedback_create_method"{
   // authorizer_id        = aws_api_gateway_authorizer.rest_api_authorizer.id     // to enable the authorizer, uncomment this line and change to authorization = "CUSTOM"  
 
   api_key_required     = false
+
+  request_models = {
+    "application/json" = aws_api_gateway_model.feedback_create_model.name
+  }
 }
 
 resource "aws_api_gateway_integration" "rest_api_feedback_create_method_integration" {

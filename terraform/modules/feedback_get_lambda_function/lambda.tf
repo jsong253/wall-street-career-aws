@@ -60,9 +60,15 @@ resource "aws_iam_role_policy_attachment" "get_registration_lambda_policy_attach
 data "archive_file" "get_feedback_get_lambda_archive_file" {
   type        = "zip"
   output_path = "${path.module}/get_feedback_get_lambda_archive_file.zip"
+  
   source {
     content   = "${file("terraform/modules/feedback_get_lambda_function/index.js")}"         // must be the full path
     filename  = "modules/feedback_get_lambda_function/index.js"
+  }
+
+  source {
+    content   = "${file("terraform/common/createLogger.js")}"         // must be the full path
+    filename  = "modules/feedback_get_lambda_function/createLogger.js"
   }
 }
 

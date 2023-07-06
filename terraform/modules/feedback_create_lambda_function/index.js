@@ -11,9 +11,7 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 
 const uuid = ()=>
 ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (a) =>
-
   (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-
 )
 
 exports.handler = async (event) => {
@@ -27,9 +25,16 @@ exports.handler = async (event) => {
 
   console.log(` body: ${JSON.stringify(body, null, 4)}`)
 
+  // Store date and time in human-readable format in a variable
+  let now = date.toISOString();
+
+  const currentDate = Date.now();
+
   const newItem = {
     ...body,
-    createdAt: new Date().getTime(),
+    start: currentDate.toUTCString(), 
+    // createdAt: new Date().getTime(),
+    createdAt: currentDate.getTime(),
     // createdAt: `${new Date(new Date().toISOString()).getTime()}`,
     ID: uuid(),
     expiryPeriod: this.getTTLTimestamp(new Date(), 31), // specify TTL

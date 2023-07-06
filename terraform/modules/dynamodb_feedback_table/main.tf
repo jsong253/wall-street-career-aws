@@ -58,7 +58,7 @@ resource "aws_dynamodb_table" "feedback_table" {
   # }
 
 
-   attribute {
+  attribute {
     name = "createdAt"
     type = "N"
   }
@@ -68,12 +68,15 @@ resource "aws_dynamodb_table" "feedback_table" {
     type = "S"
   }
 
-
+  attribute {
+    name = "registrationType"
+    type = "S"
+  }
   // name index with attribute name plus sufix 'Index'
   global_secondary_index {
-    name = "CreatedAtIndex"
-    hash_key = "createdAt"
-    range_key = "status"
+    name = "StatusIndex"
+    hash_key = "status"
+    range_key = "createdAt"
     projection_type = "ALL"
     read_capacity           = 5           
     write_capacity          = 5             // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
@@ -83,7 +86,27 @@ resource "aws_dynamodb_table" "feedback_table" {
   global_secondary_index {
     name = "emailIndex"
     hash_key = "email"
-    range_key = "phone"
+    range_key = "createdAt"
+    projection_type = "ALL"
+    read_capacity           = 5
+    write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
+  }
+
+
+  global_secondary_index {
+    name = "phoneIndex"
+    hash_key = "phone"
+    range_key = "createdAt"
+    projection_type = "ALL"
+    read_capacity           = 5
+    write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
+  }
+
+
+  global_secondary_index {
+    name = "registrationTypeIndex"
+    hash_key = "registrationType"
+    range_key = "status"
     projection_type = "ALL"
     read_capacity           = 5
     write_capacity          = 5           // must define write capacityotherwise you get: failed to create GSI: write capacity must be > 0 when billing mode is PROVISIONED
