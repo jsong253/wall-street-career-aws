@@ -26,9 +26,8 @@ exports.handler = async (event) => {
   console.log(` body: ${JSON.stringify(body, null, 4)}`)
 
   // Store date and time in human-readable format in a variable
-  let now = date.toISOString();
-
-  const currentDate = Date.now();
+  // const date = new Date().toISOString();;
+  const currentDate = new Date();
 
   const newItem = {
     ...body,
